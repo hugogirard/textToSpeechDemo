@@ -10,7 +10,8 @@
         "strName": "[uniqueString(resourceGroup().id)]",
         "strNameFunc": "[concat('funcstr',uniqueString(resourceGroup().id))]",
         "funcName": "[concat('func-api-speech-',uniqueString(resourceGroup().id))]",
-        "funcPlanName": "[concat('func-api-plan-',uniqueString(resourceGroup().id))]"
+        "funcPlanName": "[concat('func-api-plan-',uniqueString(resourceGroup().id))]",
+        "speechApiName": "[concat('speech-demo-',uniqueString(resourceGroup().id))]"
     },
     "resources": [
         {
@@ -92,7 +93,19 @@
                 "Tier": "Dynamic",
                 "Name": "Y1"
             }
-        },        
+        },     
+        {
+            "apiVersion": "2017-04-18",
+            "name": "[variables('speechApiName')]",
+            "location": "[resourceGroup().location]",
+            "type": "Microsoft.CognitiveServices/accounts",
+            "kind": "SpeechServices",
+            "sku": {
+                "name": "F0"
+            },
+            "properties": {                
+            }
+        },           
         {
             "name": "[variables('funcName')]",
             "type": "Microsoft.Web/sites",
@@ -100,6 +113,7 @@
             "location": "[resourceGroup().location]",
             "kind": "functionapp",
             "dependsOn": [
+                "[resourceId('Microsoft.CognitiveServices/accounts', variables('speechApiName'))]",
                 "[concat('microsoft.insights/components/', variables('funcName'))]",
                 "[resourceId('Microsoft.Web/serverfarms', variables('funcPlanName'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('strNameFunc'))]"
