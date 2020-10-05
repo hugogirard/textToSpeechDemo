@@ -38,4 +38,5 @@ jobs:
           region: ${{ env.LOCATION }}        
           resourceGroupName: ${{ env.RESOURCE_GROUP_NAME }}        
           template: infra/deploy.json          
-          deploymentMode: Incremental                             
+          deploymentMode: Incremental
+          parameters: adminAADObjectId=${{ env.ADMIN_AAD_OBJECT_ID }} tenantIdAdminAAD=${{ env.ADMIN_AAD_TENANT_ID }}                     
