@@ -62,7 +62,17 @@
             "properties": {
                 "name": "[variables('webAppName')]",
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms',variables('appPlanName'))]"
-            }
+            },
+            "resources": [
+                {
+                    "name": "appsettings",
+                    "type": "Microsoft.Web/sites/config",
+                    "apiVersion": "2018-11-01",
+                    "properties": {
+                        "apiUri": "test"
+                    }
+                }                
+            ]            
         },
         {
             "name": "[variables('strName')]",
