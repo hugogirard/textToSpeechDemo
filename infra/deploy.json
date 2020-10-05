@@ -217,6 +217,10 @@
                 "siteConfig": {
                     "appSettings": [
                         {
+                            "name": "UploadVoiceTextStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('strName'), ';AccountKey=', listKeys(resourceId(resourceGroup().name,'Microsoft.Storage/storageAccounts', variables('strName')), '2019-04-01').keys[0].value,';EndpointSuffix=core.windows.net')]"
+                        },
+                        {
                             "name": "SpeechApiRegion",
                             "value": "[variables('speechRegion')]"
                         },
