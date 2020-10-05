@@ -158,7 +158,7 @@
                         "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
                     ],
                     "properties": {
-                        "value": "[listKeys(variables('cognitiveServiceId'),'2019-06-01').keys[0].value]"
+                        "value": "[listKeys(variables('cognitiveServiceId'),'2017-04-18').keys[0].value]"
                     }
                 }
             ]
