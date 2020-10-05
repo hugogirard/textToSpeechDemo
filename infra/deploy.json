@@ -65,8 +65,11 @@
             },
             "resources": [
                 {
-                    "name": "appsettings",
-                    "type": "Microsoft.Web/sites/config",
+                    "name": "[concat(variables('webAppName'),'/appsettings')]",
+                    "type": "Microsoft.Web/sites/config",                    
+                    "dependsOn": [
+                        "[concat('Microsoft.Web/sites/', variables('webAppName'))]"
+                    ],                    
                     "apiVersion": "2018-11-01",
                     "properties": {
                         "apiUri": "test"
