@@ -100,7 +100,7 @@
             "location": "[resourceGroup().location]",
             "kind": "functionapp",
             "dependsOn": [
-                "[concat('microsoft.insights/components', variables('funcName'))]",
+                "[concat('microsoft.insights/components/', variables('funcName'))]",
                 "[resourceId('Microsoft.Web/serverfarms', variables('funcPlanName'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('strNameFunc'))]"
             ],
