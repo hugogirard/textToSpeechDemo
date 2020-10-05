@@ -1,0 +1,148 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {        
+    },
+    "functions": [],
+    "variables": {
+        "appPlanName": "[concat('web-plan-speech-',uniqueString(resourceGroup().id))]",
+        "webAppName": "[concat('front-end-demo-speech',uniqueString(resourceGroup().id))]",
+        "strName": "[uniqueString(resourceGroup().id)]",
+        "strNameFunc": "[concat('funcstr',uniqueString(resourceGroup().id))]",
+        "funcName": "[concat('func-api-speech-',uniqueString(resourceGroup().id))]",
+        "funcPlanName": "[concat('func-api-plan-',uniqueString(resourceGroup().id))]"
+    },
+    "resources": [
+        {
+            "name": "[variables('appPlanName')]",
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2018-02-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "S1",
+                "capacity": 1
+            },
+            "properties": {
+                "name": "[variables('appPlanName')]"
+            }
+        },
+        {
+            "name": "[variables('webAppName')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2018-11-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('appPlanName'))]"
+            ],
+            "properties": {
+                "name": "[variables('webAppName')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms',variables('appPlanName'))]"
+            }
+        },
+        {
+            "name": "[variables('strName')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "location": "[resourceGroup().location]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Premium_LRS",
+                "tier": "Premium"
+            }
+        },
+        {
+            "apiVersion": "2015-05-01",
+            "name": "[variables('funcName')]",
+            "type": "microsoft.insights/components",
+            "location": "[resourceGroup().location]",
+            "tags": {},
+            "properties": {
+                "ApplicationId": "[variables('funcName')]",
+                "Request_Source": "IbizaWebAppExtensionCreate"
+            }
+        },
+        {
+            "apiVersion": "2019-06-01",
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('strNameFunc')]",
+            "location": "[resourceGroup().location]",
+            "tags": {},
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "properties": {
+                "supportsHttpsTrafficOnly": true
+            }
+        },        
+        {
+            "apiVersion": "2018-11-01",
+            "name": "[variables('funcPlanName')]",
+            "type": "Microsoft.Web/serverfarms",
+            "location": "[resourceGroup().location]",
+            "kind": "",
+            "tags": {},
+            "dependsOn": [],
+            "properties": {
+                "name": "[variables('funcPlanName')]",
+                "workerSize": "0",
+                "workerSizeId": "0",
+                "numberOfWorkers": "1"
+            },
+            "sku": {
+                "Tier": "Dynamic",
+                "Name": "Y1"
+            }
+        },        
+        {
+            "name": "[variables('funcName')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2018-11-01",
+            "location": "[resourceGroup().location]",
+            "kind": "functionapp",
+            "dependsOn": [
+                "[concat('microsoft.insights/components', variables('funcName'))]",
+                "[resourceId('Microsoft.Web/serverfarms', variables('funcPlanName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('strNameFunc'))]"
+            ],
+            "properties": {
+                "name": "[variables('funcName')]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~3"
+                        },
+                        {
+                            "name": "FUNCTIONS_WORKER_RUNTIME",
+                            "value": "dotnet"
+                        },
+                        {
+                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                            "value": "[reference(concat('microsoft.insights/components/',variables('funcName')), '2015-05-01').InstrumentationKey]"
+                        },
+                        {
+                            "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                            "value": "[reference(concat('microsoft.insights/components/',variables('funcName')), '2015-05-01').ConnectionString]"
+                        },
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('strNameFunc'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('strNameFunc')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('strNameFunc'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('strNameFunc')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTSHARE",
+                            "value": "[concat(toLower(variables('funcName')), 'a8dd')]"
+                        }
+                    ],
+                    "use32BitWorkerProcess": true
+                },
+                "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('funcPlanName'))]",
+                "clientAffinityEnabled": true
+            }
+        }
+    ],
+    "outputs": {}
+}

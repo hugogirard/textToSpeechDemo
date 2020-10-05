@@ -1,0 +1,40 @@
+name: Deploy Infra
+
+on:
+  push:
+    paths:
+      - infra/*.json
+      - .github/workflows/deploy-infra.yml
+
+env:
+  RESOURCE_GROUP_NAME: speech-demo-rg
+  LOCATION: eastus
+
+jobs:
+  create-azure-resource:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # Login to Azure
+      - name: Azure Login
+        uses: Azure/login@v1.1
+        with:          
+          creds: ${{ secrets.SP_AZURE_CREDENTIALS }}          
+          enable-AzPSSession: false
+
+      # Create resource group
+      - name: Create Resource Group
+        run: |
+          az group create -n ${{ env.RESOURCE_GROUP_NAME }} -l ${{ env.LOCATION }}
+
+      - name: Deploy Azure Resources
+        id: dplyhub
+        uses: Azure/arm-deploy@v1.0.1
+        with:        
+          scope: resourcegroup          
+          subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}          
+          region: ${{ env.LOCATION }}        
+          resourceGroupName: ${{ env.RESOURCE_GROUP_NAME }}        
+          template: infra/deploy.json          
+          deploymentMode: Incremental                             
