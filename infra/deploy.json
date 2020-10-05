@@ -213,14 +213,14 @@
                 "name": "[variables('funcName')]",
                 "siteConfig": {
                     "appSettings": [
-                        {
-                            "name": "SpeechApiRegion",
-                            "value": "[variables('speechRegion')]"
-                        },
-                        {
-                            "name": "SpeechApiKey",
-                            "value": "[reference(resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), variables('secretKeySpeechApi'))).secretUri]"
-                        },
+                        // {
+                        //     "name": "SpeechApiRegion",
+                        //     "value": "[variables('speechRegion')]"
+                        // },
+                        // {
+                        //     "name": "SpeechApiKey",
+                        //     "value": "[reference(resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), variables('secretKeySpeechApi'))).secretUri]"
+                        // },
                         {
                             "name": "FUNCTIONS_EXTENSION_VERSION",
                             "value": "~3"
