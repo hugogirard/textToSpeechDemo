@@ -24,6 +24,4 @@ jobs:
       - name: 'Run dotnet build'
         shell: bash
         run: |
-          ls
-          pushd .
-          ls
+          dotnet build ./src/Functions/CognitiveApi/CognitiveApi.csproj -c Release -o ./output
