@@ -25,3 +25,10 @@ jobs:
         shell: bash
         run: |
           dotnet build ./src/Functions/CognitiveApi/CognitiveApi.csproj -c Release -o ./output
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v2.2.0
+        with:        
+          name: function        
+          path: ./output/*        
+          retention-days: 7
