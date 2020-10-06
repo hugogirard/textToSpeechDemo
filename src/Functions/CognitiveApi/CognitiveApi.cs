@@ -25,10 +25,11 @@ namespace CognitiveApi
                 if (_config != null)
                     return _config;
 
-                string endpoint = Environment.GetEnvironmentVariable("CognitiveService:Endpoint");
-                string subscriptionKey = Environment.GetEnvironmentVariable("CognitiveService:SubscriptionKey");
+                string endpoint = Environment.GetEnvironmentVariable("CognitiveServiceEndpoint");
+                string subscriptionKey = Environment.GetEnvironmentVariable("CognitiveServiceSubscriptionKey");
 
                 _config = SpeechConfig.FromEndpoint(new Uri(endpoint), subscriptionKey);
+                _config.SetSpeechSynthesisOutputFormat(SpeechSynthesisOutputFormat.Riff24Khz16BitMonoPcm);
                 return _config;
             } 
         }
@@ -36,7 +37,7 @@ namespace CognitiveApi
         [FunctionName("TextToAudio")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
-            [Blob("audioFiles/{query.filename}", FileAccess.Write)] Stream writer,            
+            [Blob("audioFiles", FileAccess.Write)] CloudBlobContainer container,            
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
@@ -55,34 +56,33 @@ namespace CognitiveApi
                 return new BadRequestObjectResult("The SpeechInfo object is missing mandatory parameters");
             }
 
+            string blobUri = string.Empty;
             try
             {
-                // Create the output stream from the text and
-                // save it to a blob storage
-                using (var stream = AudioOutputStream.CreatePullStream())
+                MemoryStream ms = null;                
+                using (var synthesizer = new SpeechSynthesizer(SpeechConfig, null))
                 {
-                    using (var streamConfig = AudioConfig.FromStreamOutput(stream))
-                    using (var synthesizer = new SpeechSynthesizer(SpeechConfig,streamConfig))
-                    {
-                        using (var result = await synthesizer.SpeakTextAsync(speechInfo.TextToConvert))
-                        {
-                            var audio = AudioDataStream.FromResult(result);
-                            
-                            if (result.Reason == ResultReason.Canceled) 
-                            {
-                                var cancellation = SpeechSynthesisCancellationDetails.FromResult(result);
+                    var result = await synthesizer.SpeakTextAsync("Customizing audio output format.");
 
-                                // Something went wrong
-                                if (cancellation.Reason == CancellationReason.Error) 
-                                {
-                                    log.LogError($"ErrorCode={cancellation.ErrorCode} - ErrorDetails={cancellation.ErrorDetails}");
-                                    return CreateErrorResponse();
-                                }
-                            }
+                    if (result.Reason == ResultReason.Canceled)
+                    {
+                        var cancellation = SpeechSynthesisCancellationDetails.FromResult(result);
+
+                        // Something went wrong
+                        if (cancellation.Reason == CancellationReason.Error)
+                        {
+                            log.LogError($"ErrorCode={cancellation.ErrorCode} - ErrorDetails={cancellation.ErrorDetails}");
+                            return CreateErrorResponse();
                         }
                     }
+                    
+                    ms = new MemoryStream(result.AudioData);                    
                 }
 
+                string filename = $"{Guid.NewGuid()}.wav";
+                var blob = container.GetBlockBlobReference(filename);
+                await blob.UploadFromStreamAsync(ms);
+                blobUri = blob.Uri.ToString();
             }
             catch (Exception ex)
             {
@@ -90,9 +90,7 @@ namespace CognitiveApi
                 return CreateErrorResponse();
             }
 
-            return new OkResult();
-
-            //return new OkObjectResult(responseMessage);
+            return new OkObjectResult(blobUri);            
         }
 
         private static IActionResult CreateErrorResponse()
