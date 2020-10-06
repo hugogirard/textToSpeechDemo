@@ -45,4 +45,4 @@ jobs:
         uses: Azure/functions-action@v1.1.5
         with:
           # Name of the Azure Function App
-          app-name: $FUNC_NAME
+          app-name: ${{ env.FUNC_NAME }}
