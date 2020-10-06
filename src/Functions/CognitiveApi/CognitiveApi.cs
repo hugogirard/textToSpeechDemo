@@ -37,7 +37,7 @@ namespace CognitiveApi
         [FunctionName("TextToAudio")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
-            [Blob("audiofiles", FileAccess.Write)] CloudBlobContainer container,            
+            [Blob("audiofiles", FileAccess.Write, Connection = "")] CloudBlobContainer container,            
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
