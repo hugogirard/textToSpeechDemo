@@ -37,7 +37,7 @@ namespace CognitiveApi
         [FunctionName("TextToAudio")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
-            [Blob("audioFiles", FileAccess.Write)] CloudBlobContainer container,            
+            [Blob("audiofiles", FileAccess.Write)] CloudBlobContainer container,            
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
@@ -62,7 +62,7 @@ namespace CognitiveApi
                 MemoryStream ms = null;                
                 using (var synthesizer = new SpeechSynthesizer(SpeechConfig, null))
                 {
-                    var result = await synthesizer.SpeakTextAsync("Customizing audio output format.");
+                    var result = await synthesizer.SpeakTextAsync(speechInfo.TextToConvert);
 
                     if (result.Reason == ResultReason.Canceled)
                     {
