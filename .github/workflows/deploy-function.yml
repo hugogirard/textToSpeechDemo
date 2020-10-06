@@ -25,5 +25,5 @@ jobs:
         shell: bash
         run: |
           ls
-          pushd ./scr
+          pushd .
           ls
