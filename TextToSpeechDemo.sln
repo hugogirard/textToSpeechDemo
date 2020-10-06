@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30523.141
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{50CA91A6-C789-4632-82B2-29B7BA5F699F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Functions", "Functions", "{A01936FA-DC17-4194-9EB7-335CE83F2903}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebApp", "WebApp", "{F358E04F-9729-483E-80D8-5A4BD394EE2A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CognitiveApi", "src\Functions\CognitiveApi\CognitiveApi.csproj", "{123B8862-F0B8-4379-A758-B99D356B4520}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{123B8862-F0B8-4379-A758-B99D356B4520}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{123B8862-F0B8-4379-A758-B99D356B4520}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{123B8862-F0B8-4379-A758-B99D356B4520}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{123B8862-F0B8-4379-A758-B99D356B4520}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A01936FA-DC17-4194-9EB7-335CE83F2903} = {50CA91A6-C789-4632-82B2-29B7BA5F699F}
+		{F358E04F-9729-483E-80D8-5A4BD394EE2A} = {50CA91A6-C789-4632-82B2-29B7BA5F699F}
+		{123B8862-F0B8-4379-A758-B99D356B4520} = {A01936FA-DC17-4194-9EB7-335CE83F2903}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CB83648F-7D9F-4D54-B329-E4181B2BF029}
+	EndGlobalSection
+EndGlobal
