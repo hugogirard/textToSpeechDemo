@@ -41,3 +41,8 @@ jobs:
       - name: output variable
         run: echo $FUNC_NAME
         
+      - name: Azure Functions Action
+        uses: Azure/functions-action@v1.1.5
+        with:
+          # Name of the Azure Function App
+          app-name: $FUNC_NAME
