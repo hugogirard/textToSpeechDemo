@@ -24,4 +24,6 @@ jobs:
       - name: 'Run dotnet build'
         shell: bash
         run: |
-          ls              
+          ls
+          pushd ./scr
+          ls
