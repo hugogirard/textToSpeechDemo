@@ -3,7 +3,7 @@ name: Deploy Functions
 on:
   push:
     paths:
-      - src/Functions/CognitiveApi/*.*
+      - 'src/Functions/CognitiveApi/**'
       
 jobs:
   deploy-azure-functions:
