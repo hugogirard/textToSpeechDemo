@@ -59,6 +59,9 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', variables('appPlanName'))]"
             ],
+            "tags": {
+                "appname": "wedtier-speech-demo-api"
+            },            
             "properties": {
                 "name": "[variables('webAppName')]",
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms',variables('appPlanName'))]"
@@ -212,6 +215,9 @@
                 "[resourceId('Microsoft.Web/serverfarms', variables('funcPlanName'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('strNameFunc'))]"
             ],
+            "tags": {
+                "appname": "function-speech-demo-api"
+            },
             "properties": {
                 "name": "[variables('funcName')]",
                 "siteConfig": {
