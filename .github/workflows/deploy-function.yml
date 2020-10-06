@@ -46,3 +46,4 @@ jobs:
         with:
           # Name of the Azure Function App
           app-name: ${{ env.FUNC_NAME }}
+          publish-profile: ${{ secrets.SP_AZURE_CREDENTIALS }}
