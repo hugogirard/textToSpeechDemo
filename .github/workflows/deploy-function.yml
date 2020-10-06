@@ -3,7 +3,7 @@ name: Deploy Functions
 on:
   push:
     paths:
-      - src/Functions/*
+      - src/Functions/CognitiveApi/*.*
       
 jobs:
   deploy-azure-functions:
@@ -11,3 +11,21 @@ jobs:
     
     steps:
       - uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: Azure/login@v1.1
+        with:          
+          creds: ${{ secrets.SP_AZURE_CREDENTIALS }}          
+          enable-AzPSSession: false
+
+      - name: Setup Dotnet 3.1.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '3.1.x'
+
+      - name: 'Run dotnet build'
+        shell: bash
+        run: |
+          pushd scr/Functions/CognitiveApi
+          dotnet build --configuration Release --output ./output
+          popd                    
