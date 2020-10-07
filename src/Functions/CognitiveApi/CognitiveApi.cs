@@ -18,6 +18,8 @@ namespace CognitiveApi
     public static class CognitiveApi
     {        
         private static SpeechConfig _config;
+        private static ILogger _log;
+
         private static SpeechConfig SpeechConfig 
         { 
             get 
@@ -27,6 +29,10 @@ namespace CognitiveApi
 
                 string endpoint = Environment.GetEnvironmentVariable("CognitiveServiceEndpoint");
                 string subscriptionKey = Environment.GetEnvironmentVariable("CognitiveServiceSubscriptionKey");
+
+                _log.LogDebug($"CognitiveServiceEndpoint : {endpoint}");
+                _log.LogDebug($"CognitiveServiceSubscriptionKey: {subscriptionKey}");
+
 
                 _config = SpeechConfig.FromEndpoint(new Uri(endpoint), subscriptionKey);
                 _config.SetSpeechSynthesisOutputFormat(SpeechSynthesisOutputFormat.Riff24Khz16BitMonoPcm);
@@ -40,6 +46,7 @@ namespace CognitiveApi
             [Blob("audiofiles", FileAccess.Write, Connection = "UploadVoiceTextStorage")] CloudBlobContainer container,            
             ILogger log)
         {
+            _log = log;
             log.LogInformation("C# HTTP trigger function processed a request.");
                    
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
@@ -62,7 +69,11 @@ namespace CognitiveApi
                 MemoryStream ms = null;                
                 using (var synthesizer = new SpeechSynthesizer(SpeechConfig, null))
                 {
+                    log.LogDebug("SpeechSynthesizer created");
+
                     var result = await synthesizer.SpeakTextAsync(speechInfo.TextToConvert);
+
+                    log.LogDebug("Result for text to audio");
 
                     if (result.Reason == ResultReason.Canceled)
                     {

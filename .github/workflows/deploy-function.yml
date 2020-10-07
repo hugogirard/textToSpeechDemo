@@ -2,8 +2,10 @@ name: Deploy Functions
 
 on:
   push:
+    branches:
+      - master
     paths:
-      - ./src/Functions/**
+      - 'src/Functions/**'
 
 jobs:
   build-azure-functions:
