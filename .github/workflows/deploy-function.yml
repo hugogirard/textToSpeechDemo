@@ -1,14 +1,11 @@
 name: Deploy Functions
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - master
-    ignore-paths:
-    - infra/*.json      
     paths:
-      - .github/workflows/deploy-function.yml
+      - src/Functions/**
 
 jobs:
   build-azure-functions:
