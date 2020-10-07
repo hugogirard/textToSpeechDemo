@@ -1,6 +1,7 @@
 name: Deploy Infra
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - infra/*.json
