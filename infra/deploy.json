@@ -228,7 +228,7 @@
                         },
                         {
                             "name": "CognitiveServiceEndpoint",
-                            "value": "[reference(resourceId('Microsoft.CognitiveServices/accounts', variables('speechApiName'))).CognitiveServiceEndpoint]"
+                            "value": "[reference(resourceId('Microsoft.CognitiveServices/accounts', variables('speechApiName'))).endpoint]"
                         },
                         {
                             "name": "CognitiveServiceSubscriptionKey",
