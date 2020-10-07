@@ -86,12 +86,20 @@ namespace CognitiveApi
                             return CreateErrorResponse();
                         }
                     }
-                    
+
+                    log.LogInformation("Getting memory object");
+
                     ms = new MemoryStream(result.AudioData);                    
                 }
 
                 string filename = $"{Guid.NewGuid()}.wav";
+                
+                log.LogInformation("Getting blob reference");
+
                 var blob = container.GetBlockBlobReference(filename);
+
+                log.LogInformation("Uploading to blob reference");
+
                 await blob.UploadFromStreamAsync(ms);
                 blobUri = blob.Uri.ToString();
             }
