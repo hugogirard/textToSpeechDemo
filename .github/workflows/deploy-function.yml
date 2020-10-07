@@ -2,6 +2,8 @@ name: Deploy Functions
 
 on:
   push:
+    paths:
+      - ./src/Functions/**
 
 jobs:
   build-azure-functions:
