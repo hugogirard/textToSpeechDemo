@@ -47,7 +47,7 @@ namespace CognitiveApi
             ILogger log)
         {
             _log = log;
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            log.LogInformation("Processing request text to speech.");
                    
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
 
