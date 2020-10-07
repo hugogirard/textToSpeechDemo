@@ -5,8 +5,10 @@ on:
   push:
     branches:
       - master
+    ignore-paths:
+    - infra/*.json      
     paths:
-      - 'src/Functions/**'
+      - .github/workflows/deploy-function.yml
 
 jobs:
   build-azure-functions:

@@ -30,8 +30,8 @@ namespace CognitiveApi
                 string endpoint = Environment.GetEnvironmentVariable("CognitiveServiceEndpoint");
                 string subscriptionKey = Environment.GetEnvironmentVariable("CognitiveServiceSubscriptionKey");
 
-                _log.LogDebug($"CognitiveServiceEndpoint : {endpoint}");
-                _log.LogDebug($"CognitiveServiceSubscriptionKey: {subscriptionKey}");
+                _log.LogInformation($"CognitiveServiceEndpoint : {endpoint}");
+                _log.LogInformation($"CognitiveServiceSubscriptionKey: {subscriptionKey}");
 
 
                 _config = SpeechConfig.FromEndpoint(new Uri(endpoint), subscriptionKey);
@@ -63,17 +63,17 @@ namespace CognitiveApi
                 return new BadRequestObjectResult("The SpeechInfo object is missing mandatory parameters");
             }
 
-            string blobUri = string.Empty;
+            string blobUri;
             try
             {
                 MemoryStream ms = null;                
                 using (var synthesizer = new SpeechSynthesizer(SpeechConfig, null))
                 {
-                    log.LogDebug("SpeechSynthesizer created");
+                    log.LogInformation("SpeechSynthesizer created");
 
                     var result = await synthesizer.SpeakTextAsync(speechInfo.TextToConvert);
 
-                    log.LogDebug("Result for text to audio");
+                    log.LogInformation("Result for text to audio");
 
                     if (result.Reason == ResultReason.Canceled)
                     {
