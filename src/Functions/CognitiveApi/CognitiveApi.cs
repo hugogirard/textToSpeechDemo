@@ -102,6 +102,8 @@ namespace CognitiveApi
 
                 await blob.UploadFromStreamAsync(ms);
                 blobUri = blob.Uri.ToString();
+
+                log.LogInformation("Blob uploaded");
             }
             catch (Exception ex)
             {

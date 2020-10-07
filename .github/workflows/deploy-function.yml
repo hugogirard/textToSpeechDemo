@@ -3,10 +3,8 @@ name: Deploy Functions
 on:
   workflow_dispatch:
   push:
-    branches:
-      - master
     paths:
-      - src/Functions/**
+      - 'src/Functions/**'
 
 jobs:
   build-azure-functions:
