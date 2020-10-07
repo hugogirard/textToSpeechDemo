@@ -86,8 +86,9 @@ namespace CognitiveApi
             }
             catch (Exception ex)
             {
-                log.LogError("Cannot process text to audio file", ex);
-                return CreateErrorResponse();
+                throw ex;
+                //log.LogError("Cannot process text to audio file", ex);
+                //return CreateErrorResponse();
             }
 
             return new OkObjectResult(blobUri);            
