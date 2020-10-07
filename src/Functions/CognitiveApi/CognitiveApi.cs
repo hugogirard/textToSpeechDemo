@@ -74,9 +74,11 @@ namespace CognitiveApi
                     var result = await synthesizer.SpeakTextAsync(speechInfo.TextToConvert);
 
                     log.LogInformation("Result for text to audio");
+                    log.LogInformation($"Result reason {result.Reason}");
 
                     if (result.Reason == ResultReason.Canceled)
                     {
+                        log.LogInformation($"Get cancellation result {result.Reason}");
                         var cancellation = SpeechSynthesisCancellationDetails.FromResult(result);
 
                         // Something went wrong
