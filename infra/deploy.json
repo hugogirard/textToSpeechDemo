@@ -193,8 +193,7 @@
                 "[resourceId('Microsoft.CognitiveServices/accounts', variables('speechApiName'))]",
                 "[concat('microsoft.insights/components/', variables('funcName'))]",
                 "[resourceId('Microsoft.Web/serverfarms', variables('funcPlanName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('strNameFunc'))]",
-                "[variables('keyVaultSecretReferenceId')]"
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('strNameFunc'))]"                
             ],
             "tags": {
                 "appname": "function-speech-demo-api"
