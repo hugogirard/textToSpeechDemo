@@ -112,6 +112,8 @@ namespace CognitiveApi
                                                                    Environment.GetEnvironmentVariable("StorageAccountName"), 
                                                                    "audiofiles");
 
+                log.LogInformation($"Value of the SAS: {sas}");
+
                 blobUri = $"{blob.Uri}?{sas}";
 
                 log.LogInformation("Blob uploaded");
