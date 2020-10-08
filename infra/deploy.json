@@ -216,7 +216,7 @@
                         },
                         {
                             "name": "StorageAccountName",
-                            "value": "[reference(variables('storageReferenceId')).name]"
+                            "value": "[variables('strName')]"
                         },
                         {
                             "name": "AudioFilesStorageKey",
