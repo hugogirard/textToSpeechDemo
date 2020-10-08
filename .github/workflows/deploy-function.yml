@@ -62,4 +62,4 @@ jobs:
         with:
           # Name of the Azure Function App
           app-name: ${{ env.FUNC_NAME }}
-          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+          #publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
