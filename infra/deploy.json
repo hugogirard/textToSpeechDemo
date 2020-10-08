@@ -89,19 +89,19 @@
             "sku": {
                 "name": "Standard_LRS",
                 "tier": "Standard"
-            },
-            "resources": [
-                {
-                    "name": "[concat('default/','audiofiles')]",
-                    "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-                    "apiVersion": "2019-06-01",
-                    "properties": {
-                        "publicAccess": "None"
-                    },
-                    "resources": []
-                }                
-            ]
+            }
         },
+        {
+            "name": "[concat(variables('strName'),'/default/audiofiles')]",
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-06-01",
+            "properties": {
+                "publicAccess": "None"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/', variables('strName'))]"
+            ]
+        },        
         {
             "apiVersion": "2015-05-01",
             "name": "[variables('funcName')]",
