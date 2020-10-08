@@ -29,7 +29,7 @@
         "secretKeySpeechApi": "speech-api-key",        
         "cognitiveServiceId": "[resourceId('Microsoft.CognitiveServices/accounts',variables('speechApiName'))]",
         "identityID": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('userAssignedIdentity'))]",
-        "keyVaultSecretReferenceId": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'))]"
+        "keyVaultSecretReferenceId": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'),variables('secretKeySpeechApi'))]"
     },
     "resources": [
         {
