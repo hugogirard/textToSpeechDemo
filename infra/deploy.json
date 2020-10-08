@@ -87,8 +87,8 @@
             "location": "[resourceGroup().location]",
             "kind": "StorageV2",
             "sku": {
-                "name": "Premium_LRS",
-                "tier": "Premium"
+                "name": "Standard_LRS",
+                "tier": "Standard"
             }
         },
         {
@@ -214,7 +214,8 @@
                 "[resourceId('Microsoft.CognitiveServices/accounts', variables('speechApiName'))]",
                 "[concat('microsoft.insights/components/', variables('funcName'))]",
                 "[resourceId('Microsoft.Web/serverfarms', variables('funcPlanName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('strNameFunc'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('strNameFunc'))]",
+                "[variables('keyVaultSecretReferenceId')]"
             ],
             "tags": {
                 "appname": "function-speech-demo-api"
