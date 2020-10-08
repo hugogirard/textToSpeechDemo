@@ -1,0 +1,31 @@
+﻿@inject IJSRuntime JSRuntime;
+
+<div class="card" style="width: 18rem">
+    <div class="card-body">
+        <h5>Audio File</h5>
+        <audio controls>
+            <source src="@AudioSource" />
+        </audio>
+        <p class="card-text">
+            This is the audio file generated from your text
+        </p>
+        <button @onclick="Download" class="btn btn-primary">Download</button>
+        <button @onclick="OnCancel" class="btn btn-danger">Cancel</button>
+    </div>
+</div>
+
+
+@code {
+
+    [Parameter]
+    public string AudioSource { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    async Task Download()
+    {
+        await JSRuntime.InvokeVoidAsync("downloadFromUrl", AudioSource);
+    }
+
+}

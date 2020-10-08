@@ -11,7 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebApp", "WebApp", "{F358E0
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CognitiveApi", "src\Functions\CognitiveApi\CognitiveApi.csproj", "{123B8862-F0B8-4379-A758-B99D356B4520}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorClient", "src\WebApp\BlazorClient\BlazorClient.csproj", "{98F637B1-E9D9-49B4-8590-11CC9AFA05C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorClient", "src\WebApp\BlazorClient\BlazorClient.csproj", "{98F637B1-E9D9-49B4-8590-11CC9AFA05C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
