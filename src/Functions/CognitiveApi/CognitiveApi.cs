@@ -43,7 +43,7 @@ namespace CognitiveApi
         [FunctionName("TextToAudio")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
-            [Blob("audiofiles", FileAccess.Write, Connection = "UploadVoiceTextStorage")] CloudBlobContainer container,            
+            [Blob("audiofiles", FileAccess.ReadWrite, Connection = "UploadVoiceTextStorage")] CloudBlobContainer container,            
             ILogger log)
         {
             _log = log;

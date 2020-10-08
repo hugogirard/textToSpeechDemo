@@ -9,7 +9,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Functions", "Functions", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebApp", "WebApp", "{F358E04F-9729-483E-80D8-5A4BD394EE2A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CognitiveApi", "src\Functions\CognitiveApi\CognitiveApi.csproj", "{123B8862-F0B8-4379-A758-B99D356B4520}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CognitiveApi", "src\Functions\CognitiveApi\CognitiveApi.csproj", "{123B8862-F0B8-4379-A758-B99D356B4520}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorClient", "src\WebApp\BlazorClient\BlazorClient.csproj", "{98F637B1-E9D9-49B4-8590-11CC9AFA05C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{123B8862-F0B8-4379-A758-B99D356B4520}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{123B8862-F0B8-4379-A758-B99D356B4520}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{123B8862-F0B8-4379-A758-B99D356B4520}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98F637B1-E9D9-49B4-8590-11CC9AFA05C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98F637B1-E9D9-49B4-8590-11CC9AFA05C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98F637B1-E9D9-49B4-8590-11CC9AFA05C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98F637B1-E9D9-49B4-8590-11CC9AFA05C4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -29,6 +35,7 @@ Global
 		{A01936FA-DC17-4194-9EB7-335CE83F2903} = {50CA91A6-C789-4632-82B2-29B7BA5F699F}
 		{F358E04F-9729-483E-80D8-5A4BD394EE2A} = {50CA91A6-C789-4632-82B2-29B7BA5F699F}
 		{123B8862-F0B8-4379-A758-B99D356B4520} = {A01936FA-DC17-4194-9EB7-335CE83F2903}
+		{98F637B1-E9D9-49B4-8590-11CC9AFA05C4} = {F358E04F-9729-483E-80D8-5A4BD394EE2A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CB83648F-7D9F-4D54-B329-E4181B2BF029}

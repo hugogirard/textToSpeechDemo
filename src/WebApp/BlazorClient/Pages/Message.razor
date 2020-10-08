@@ -1,0 +1,40 @@
+﻿@page "/"
+@inject IHttpClientFactory _httpClientFactory
+
+<EditForm Model="@VM" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="text">Message</label>
+        <InputTextArea @attributes="InputAttributes" id="text" @bind-Value="VM.Text" />
+    </div>
+
+    <button class="btn btn-primary" type="submit">Submit</button>
+</EditForm>
+
+@code {
+
+    public Dictionary<string, object> InputAttributes { get; set; } = new Dictionary<string, object>
+{
+        { "class", "form-control" }
+    };
+
+    private Model.Message VM = new Model.Message();
+
+    private async Task HandleValidSubmit()
+    {
+        var httpClient = _httpClientFactory.CreateClient("SpeechApi");
+
+        var json = JsonConvert.SerializeObject(VM);
+        var data = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+        var response = await httpClient.PostAsync(string.Empty,data);
+
+        if (response.IsSuccessStatusCode)
+        {
+            string fileUrl = await response.Content.ReadAsStringAsync();
+        }
+    }
+
+}
