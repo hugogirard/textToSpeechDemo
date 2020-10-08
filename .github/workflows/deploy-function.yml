@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - 'src/Functions/**'
+      - .github/workflows/deploy-function.yml
 
 jobs:
   build-azure-functions:
