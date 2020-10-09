@@ -7,6 +7,9 @@ on:
       - 'src/WebApp/**'
       - .github/workflows/deploy-blazor.yml
 
+env:
+  RESOURCE_GROUP: speech-demo-rg
+
 jobs:
   build-blazor-server:
     runs-on: ubuntu-latest
@@ -51,12 +54,12 @@ jobs:
         run: |
          export WEB_NAME=$(az resource list --tag 'appname=wedtier-speech-demo-api' --query [0].name)
          echo "::set-env name=WEB_NAME::$WEB_NAME"
-         
-      - name: Azure WebApp
-        uses: Azure/webapps-deploy@v2
-        with:          
-          app-name: ${{ env.WEB_NAME }}     
-          package: '*.zip'
+        
+        # Run into problem with Github Action
+        # use AZ CLI
+      - name: DeployWebApp
+        run: |
+          az webapp deployment source config-zip --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.WEB_NAME }} --src blazor.zip
   
       - name: Azure logout
         run: |
