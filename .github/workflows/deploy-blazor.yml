@@ -9,6 +9,7 @@ on:
 
 env:
   RESOURCE_GROUP: speech-demo-rg
+  WEB_APP_NAME: front-end-demo-speecheydjiqdi56wcs
 
 jobs:
   build-blazor-server:
@@ -26,15 +27,10 @@ jobs:
       - name: Building web app
         uses: azure/appservice-build@v2
 
-      - name: get blazor name
-        run: |
-         export WEB_NAME=$(az resource list --tag 'appname=wedtier-speech-demo-api' --query [0].name)
-         echo "::set-env name=WEB_NAME::$WEB_NAME"
-
       - name: Deploying web app to Azure
         uses: azure/webapps-deploy@v1
         with:
-          app-name: 'front-end-demo-speecheydjiqdi56wcs'
+          app-name: ${{ env.WEB_APP_NAME }}
           
       - name: Azure logout
         run: |
