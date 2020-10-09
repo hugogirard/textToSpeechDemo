@@ -23,14 +23,12 @@
         "strNameFunc": "[concat('funcstr',uniqueString(resourceGroup().id))]",
         "funcName": "[concat('func-api-speech-',uniqueString(resourceGroup().id))]",
         "funcPlanName": "[concat('func-api-plan-',uniqueString(resourceGroup().id))]",
-        "speechApiName": "[concat('speech-demo-',uniqueString(resourceGroup().id))]",        
-        "keyVaultName": "[concat('kv-speech-',uniqueString(resourceGroup().id))]",
-        "userAssignedIdentity": "[concat('func-user-ident-',uniqueString(resourceGroup().id))]",
-        "secretKeySpeechApi": "speech-api-key",        
+        "speechApiName": "[concat('speech-demo-',uniqueString(resourceGroup().id))]",                
+        "userAssignedIdentity": "[concat('func-user-ident-',uniqueString(resourceGroup().id))]",        
         "signalRServiceName": "[concat('signalr-',uniqueString(resourceGroup().id))]",
         "cognitiveServiceId": "[resourceId('Microsoft.CognitiveServices/accounts',variables('speechApiName'))]",
         "identityID": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('userAssignedIdentity'))]",
-        "keyVaultSecretReferenceId": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'),variables('secretKeySpeechApi'))]"
+        "storageReferenceId": "[resourceId('Microsoft.Storage/storageAccounts',variables('strName'))]"
     },
     "resources": [
         {
@@ -186,63 +184,6 @@
             }
         },    
         {
-            "name": "[variables('keyVaultName')]",
-            "type": "Microsoft.KeyVault/vaults",
-            "apiVersion": "2016-10-01",
-            "dependsOn": [
-                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('userAssignedIdentity'))]",
-                "[resourceId('Microsoft.CognitiveServices/accounts', variables('speechApiName'))]"
-            ],
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "enabledForDeployment": true,
-                "enabledForTemplateDeployment": true,
-                "enabledForDiskEncryption": true,
-                "tenantId": "[subscription().tenantId]",
-                "accessPolicies": [
-                    {
-                        "tenantId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities',variables('userAssignedIdentity'))).tenantId]",
-                        "objectId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities',variables('userAssignedIdentity'))).principalId]",
-                        "permissions": {
-                            "secrets": [
-                                "List",
-                                "Get",
-                                "Set"
-                            ]
-                        }
-                    },
-                    {
-                        "tenantId": "[parameters('tenantIdAdminAAD')]",
-                        "objectId": "[parameters('adminAADObjectId')]",
-                        "permissions": {
-                            "secrets": [
-                                "List",
-                                "Get",
-                                "Set"
-                            ]
-                        }
-                    }                    
-                ],
-                "sku": {
-                    "name": "standard",
-                    "family": "A"
-                }
-            },
-            "resources": [
-                {
-                    "type": "secrets",
-                    "name": "[variables('secretKeySpeechApi')]",
-                    "apiVersion": "2016-10-01",
-                    "dependsOn": [
-                        "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
-                    ],
-                    "properties": {
-                        "value": "[listKeys(variables('cognitiveServiceId'),'2017-04-18').key1]"
-                    }
-                }            
-            ]
-        },
-        {
             "name": "[variables('funcName')]",
             "type": "Microsoft.Web/sites",
             "apiVersion": "2018-11-01",
@@ -252,8 +193,7 @@
                 "[resourceId('Microsoft.CognitiveServices/accounts', variables('speechApiName'))]",
                 "[concat('microsoft.insights/components/', variables('funcName'))]",
                 "[resourceId('Microsoft.Web/serverfarms', variables('funcPlanName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('strNameFunc'))]",
-                "[variables('keyVaultSecretReferenceId')]"
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('strNameFunc'))]"                
             ],
             "tags": {
                 "appname": "function-speech-demo-api"
@@ -272,7 +212,15 @@
                         },                        
                         {
                             "name": "CognitiveServiceSubscriptionKey",
-                            "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('keyVaultSecretReferenceId')).secretUriWithVersion, ')')]"
+                            "value": "[listKeys(variables('cognitiveServiceId'),'2017-04-18').key1]"
+                        },
+                        {
+                            "name": "StorageAccountName",
+                            "value": "[variables('strName')]"
+                        },
+                        {
+                            "name": "AudioFilesStorageKey",
+                            "value": "[listKeys(variables('storageReferenceId'),'2019-04-01').keys[0].value]"
                         },
                         {
                             "name": "FUNCTIONS_EXTENSION_VERSION",

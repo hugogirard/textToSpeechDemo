@@ -8,4 +8,8 @@
     <PackageReference Include="Microsoft.Azure.SignalR" Version="1.5.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\css\font-awesome\" />
+  </ItemGroup>
+
 </Project>

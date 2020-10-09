@@ -12,6 +12,7 @@ using Microsoft.CognitiveServices.Speech;
 using CognitiveApi.Model;
 using Microsoft.CognitiveServices.Speech.Audio;
 using Microsoft.Azure.Storage.Queue.Protocol;
+using System.Runtime.CompilerServices;
 
 namespace CognitiveApi
 {
@@ -19,6 +20,8 @@ namespace CognitiveApi
     {        
         private static SpeechConfig _config;
         private static ILogger _log;
+
+        private static ValetKey ValetKey => new ValetKey();
 
         private static SpeechConfig SpeechConfig 
         { 
@@ -93,7 +96,7 @@ namespace CognitiveApi
 
                     ms = new MemoryStream(result.AudioData);                    
                 }
-
+                
                 string filename = $"{Guid.NewGuid()}.wav";
                 
                 log.LogInformation("Getting blob reference");
@@ -103,7 +106,15 @@ namespace CognitiveApi
                 log.LogInformation("Uploading to blob reference");
 
                 await blob.UploadFromStreamAsync(ms);
-                blobUri = blob.Uri.ToString();
+
+                // Get SAS
+                string sas = ValetKey.GetSharedAccessReferenceView(filename, 
+                                                                   Environment.GetEnvironmentVariable("StorageAccountName"), 
+                                                                   "audiofiles");
+
+                log.LogInformation($"Value of the SAS: {sas}");
+
+                blobUri = $"{blob.Uri}?{sas}";
 
                 log.LogInformation("Blob uploaded");
             }

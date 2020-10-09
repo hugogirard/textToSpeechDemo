@@ -1,40 +1,87 @@
 ﻿@page "/"
 @inject IHttpClientFactory _httpClientFactory
 
-<EditForm Model="@VM" OnValidSubmit="@HandleValidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+<Loading IsLoading="@Loading"/>
 
-    <div class="form-group">
-        <label for="text">Message</label>
-        <InputTextArea @attributes="InputAttributes" id="text" @bind-Value="VM.Text" />
-    </div>
 
-    <button class="btn btn-primary" type="submit">Submit</button>
-</EditForm>
+<div class="container">
+    @if (!ShowAudioPanel)
+    {
+        <div class="row">
+            <h1>Please enter your message to leave a voice mail</h1>
+        </div>
+        <div class="row">
+            <div class="col-md">
+                <EditForm Model="@VM" OnValidSubmit="@HandleValidSubmit">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="form-group">
+                        <label for="text">Message</label>
+                        <InputTextArea @attributes="InputAttributes" id="text" @bind-Value="VM.Text" />
+                    </div>
+
+                    <button class="btn btn-primary" type="submit">Submit</button>
+                </EditForm>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-md">
+                <AudioPanel AudioSource="@AudioUri" OnCancel="@Cancel" />
+            </div>
+        </div>
+    }
+</div>
+
 
 @code {
+
+    public bool ShowAudioPanel { get; set; }
+
+    public bool Loading { get; set; }
+
+    public string AudioUri { get; set; }
 
     public Dictionary<string, object> InputAttributes { get; set; } = new Dictionary<string, object>
 {
         { "class", "form-control" }
     };
 
+    private void Cancel()
+    {
+        this.ShowAudioPanel = false;
+        this.VM = new Model.Message();
+    }
+
     private Model.Message VM = new Model.Message();
 
     private async Task HandleValidSubmit()
     {
+        Loading = true;
+
         var httpClient = _httpClientFactory.CreateClient("SpeechApi");
 
         var json = JsonConvert.SerializeObject(VM);
         var data = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
 
-        var response = await httpClient.PostAsync(string.Empty,data);
+        var response = await httpClient.PostAsync(string.Empty, data);
+
+        Loading = false;
 
         if (response.IsSuccessStatusCode)
         {
-            string fileUrl = await response.Content.ReadAsStringAsync();
+            AudioUri = await response.Content.ReadAsStringAsync();
+            ShowAudioPanel = true;
         }
+        else 
+        { 
+        
+        }
+
+
     }
 
 }

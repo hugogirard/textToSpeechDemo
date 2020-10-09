@@ -1,0 +1,41 @@
+name: Deploy Blazor Client
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'src/WebApp/**'
+      - .github/workflows/deploy-blazor.yml
+
+env:
+  RESOURCE_GROUP: speech-demo-rg
+
+jobs:
+  build-blazor-server:
+    runs-on: ubuntu-latest
+  
+    steps:
+      - uses: actions/checkout@v2
+                
+      - name: Azure Login
+        uses: Azure/login@v1.1
+        with:          
+          creds: ${{ secrets.SP_AZURE_CREDENTIALS }}          
+          enable-AzPSSession: false
+
+      - name: Building web app
+        uses: azure/appservice-build@v2
+
+      - name: get blazor name
+        run: |
+         export WEB_NAME=$(az resource list --tag 'appname=wedtier-speech-demo-api' --query [0].name)
+         echo "::set-env name=WEB_NAME::$WEB_NAME"
+
+      - name: Deploying web app to Azure
+        uses: azure/webapps-deploy@v1
+        with:
+          app-name: 'front-end-demo-speecheydjiqdi56wcs'
+          
+      - name: Azure logout
+        run: |
+          az logout
