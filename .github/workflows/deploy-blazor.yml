@@ -16,12 +16,7 @@ jobs:
   
     steps:
       - uses: actions/checkout@v2
-      
-      - name: Setup Dotnet 3.1.x
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: '3.1.x'
-          
+                
       - name: Azure Login
         uses: Azure/login@v1.1
         with:          
@@ -30,6 +25,8 @@ jobs:
 
       - name: Building web app
         uses: azure/appservice-build@v2
+        with:
+          platform-version: '.NET Core 3.1'
 
       - name: get blazor name
         run: |
@@ -39,7 +36,7 @@ jobs:
       - name: Deploying web app to Azure
         uses: azure/webapps-deploy@v1
         with:
-          app-name: ${{ env.WEB_NAME }}
+          app-name: 'front-end-demo-speecheydjiqdi56wcs'
           
       - name: Azure logout
         run: |
