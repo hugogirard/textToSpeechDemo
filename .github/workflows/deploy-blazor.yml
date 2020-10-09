@@ -22,45 +22,25 @@ jobs:
         with:
           dotnet-version: '3.1.x'
           
-      - name: 'Run dotnet build'
-        shell: bash
-        run: |
-          dotnet build ./src/WebApp/BlazorClient/BlazorClient.csproj -c Release -o ./output  
-          
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v2.2.0
-        with:        
-          name: blazor   
-          path: ./output/*        
-          retention-days: 7
-
-  deploy-blazor-server:
-    runs-on: ubuntu-latest          
-    needs: build-blazor-server
-    
-    steps:
-      - name: Download a Build Artifact
-        uses: actions/download-artifact@v2.0.5
-        with:
-          name: blazor              
-          
       - name: Azure Login
         uses: Azure/login@v1.1
         with:          
           creds: ${{ secrets.SP_AZURE_CREDENTIALS }}          
           enable-AzPSSession: false
 
+      - name: Building web app
+        uses: azure/appservice-build@v2
+
       - name: get blazor name
         run: |
          export WEB_NAME=$(az resource list --tag 'appname=wedtier-speech-demo-api' --query [0].name)
          echo "::set-env name=WEB_NAME::$WEB_NAME"
-        
-        # Run into problem with Github Action
-        # use AZ CLI
-      - name: DeployWebApp
-        run: |
-          ls
-  
+
+      - name: Deploying web app to Azure
+        uses: azure/webapps-deploy@v1
+        with:
+          app-name: ${{ env.WEB_NAME }}
+          
       - name: Azure logout
         run: |
           az logout
