@@ -1,4 +1,4 @@
-name: Deploy Functions
+name: Deploy Blazor Client
 
 on:
   workflow_dispatch:
