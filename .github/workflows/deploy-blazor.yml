@@ -59,7 +59,7 @@ jobs:
         # use AZ CLI
       - name: DeployWebApp
         run: |
-          az webapp deployment source config-zip --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.WEB_NAME }} --src blazor.zip
+          ls
   
       - name: Azure logout
         run: |
