@@ -25,8 +25,6 @@ jobs:
 
       - name: Building web app
         uses: azure/appservice-build@v2
-        with:
-          platform-version: '.NET Core 3.1'
 
       - name: get blazor name
         run: |
