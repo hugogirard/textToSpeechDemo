@@ -56,4 +56,7 @@ jobs:
         uses: Azure/webapps-deploy@v2
         with:          
           app-name: ${{ env.WEB_NAME }}          
-          publish-profile: ${{ secrets.AZURE_BLAZORAPP_PUBLISH_PROFILE }}
+  
+      - name: Azure logout
+        run: |
+          az logout
