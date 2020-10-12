@@ -1,8 +1,10 @@
 name: Deploy Blazor Client
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  
   push:
+    branches:
+      - main
     paths:
       - 'src/WebApp/**'
       - .github/workflows/deploy-blazor.yml

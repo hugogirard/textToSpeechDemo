@@ -32,12 +32,8 @@ namespace BlazorClient
             {
                 c.BaseAddress = new Uri(Configuration["SpeechApiUrl"]);
             });
-            //services.AddSignalR().AddAzureSignalR(options =>
-            //{
-            //    options.ConnectionString = "SignalRService";
-            //    options.ServerStickyMode =
-            //        Microsoft.Azure.SignalR.ServerStickyMode.Required;
-            //});
+            services.AddSignalR().AddAzureSignalR(Configuration["SignalRService"]);
+
 
         }
 

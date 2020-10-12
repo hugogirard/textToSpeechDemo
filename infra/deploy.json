@@ -28,7 +28,9 @@
         "signalRServiceName": "[concat('signalr-',uniqueString(resourceGroup().id))]",
         "cognitiveServiceId": "[resourceId('Microsoft.CognitiveServices/accounts',variables('speechApiName'))]",
         "identityID": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('userAssignedIdentity'))]",
-        "storageReferenceId": "[resourceId('Microsoft.Storage/storageAccounts',variables('strName'))]"
+        "storageReferenceId": "[resourceId('Microsoft.Storage/storageAccounts',variables('strName'))]",
+        "cosmosDbName": "[concat('cosmosdb-',uniqueString(resourceGroup().id))]",
+        "vnetCloudName": "vnet-cloud-services"
     },
     "resources": [
         {
@@ -178,11 +180,38 @@
             "type": "Microsoft.CognitiveServices/accounts",
             "kind": "SpeechServices",
             "sku": {
-                "name": "F0"
+                "name": "S0"
             },
             "properties": {                
             }
-        },    
+        },
+        {
+            "apiVersion": "2020-04-01",
+            "kind": "GlobalDocumentDB",
+            "type": "Microsoft.DocumentDb/databaseAccounts",
+            "name": "[variables('cosmosDbName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "databaseAccountOfferType": "Standard",
+                "locations": [
+                    {
+                        "id": "[concat(variables('cosmosDbName'), '-', resourceGroup().location)]",
+                        "failoverPriority": 0,
+                        "locationName": "[resourceGroup().location]"
+                    }
+                ],
+                "isVirtualNetworkFilterEnabled": false,
+                "virtualNetworkRules": [],
+                "ipRules": [],
+                "dependsOn": [],
+                "capabilities": [
+                    {
+                        "name": "EnableServerless"
+                    }
+                ],
+                "enableFreeTier": false
+            }
+        },
         {
             "name": "[variables('funcName')]",
             "type": "Microsoft.Web/sites",
@@ -261,6 +290,27 @@
                 "userAssignedIdentities": {
                     "[variables('identityID')]": { }
                 }
+            }
+        },
+        {
+            "name": "[variables('vnetCloudName')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2019-11-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.0.0.0/16"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "apim-vnet",
+                        "properties": {
+                            "addressPrefix": "10.0.0.0/24"
+                        }
+                    }
+                ]
             }
         }
     ],

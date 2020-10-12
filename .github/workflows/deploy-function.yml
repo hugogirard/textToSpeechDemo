@@ -3,6 +3,8 @@ name: Deploy Functions
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
     paths:
       - 'src/Functions/**'
       - .github/workflows/deploy-function.yml
