@@ -28,7 +28,7 @@
         "signalRServiceName": "[concat('signalr-',uniqueString(resourceGroup().id))]",
         "cognitiveServiceId": "[resourceId('Microsoft.CognitiveServices/accounts',variables('speechApiName'))]",
         "identityID": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('userAssignedIdentity'))]",
-        "storageReferenceId": "[resourceId('Microsoft.Storage/storageAccounts',variables('strName'))]"
+        "storageReferenceId": "[resourceId('Microsoft.Storage/storageAccounts',variables('strName'))]"        
     },
     "resources": [
         {
@@ -99,12 +99,11 @@
                         "[concat('Microsoft.Web/sites/', variables('webAppName'))]"
                     ],                    
                     "apiVersion": "2018-11-01",
-                    "properties": {
-                        "apiUri": "test"
+                    "properties": {                        
                     }
                 }                
             ]            
-        },
+        },      
         {
             "name": "[variables('strName')]",
             "type": "Microsoft.Storage/storageAccounts",
@@ -127,6 +126,17 @@
                 "[concat('Microsoft.Storage/storageAccounts/', variables('strName'))]"
             ]
         },        
+        {
+            "name": "[concat(variables('strName'),'/default/speechConfig')]",
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-06-01",
+            "properties": {
+                "publicAccess": "None"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/', variables('strName'))]"
+            ]
+        },          
         {
             "apiVersion": "2015-05-01",
             "name": "[variables('funcName')]",
