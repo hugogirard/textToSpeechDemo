@@ -13,7 +13,19 @@
             "metadata": { 
                 "description": "Tenant ID of the Admin Group or User to give access to key vault"
             }
-        }
+        },
+        "adminEmail": {
+            "type": "string",
+            "metadata": {
+                "description": "The admin email of the APIM"
+            }
+        },
+        "orgName": {
+            "type": "string",
+            "metadata": {
+                "description": "The organization name"
+            }
+        }        
     },
     "functions": [],
     "variables": {
@@ -30,7 +42,10 @@
         "identityID": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('userAssignedIdentity'))]",
         "storageReferenceId": "[resourceId('Microsoft.Storage/storageAccounts',variables('strName'))]",
         "cosmosDbName": "[concat('cosmosdb-',uniqueString(resourceGroup().id))]",
-        "vnetCloudName": "vnet-cloud-services"
+        "vnetCloudName": "vnet-cloud-services",
+        "serviceBusName": "[concat('svb-',uniqueString(resourceGroup().id))]",
+        "appInsightsId": "[resourceId('microsoft.insights/components',variables('funcName'))]",
+        "apimName": "[concat('apim-',uniqueString(resourceGroup().id))]"
     },
     "resources": [
         {
@@ -312,7 +327,109 @@
                     }
                 ]
             }
-        }
+        },
+        {
+            "apiVersion": "2019-12-01",
+            "name": "[variables('apimName')]",
+            "location": "[resourceGroup().location]",
+            "type": "Microsoft.ApiManagement/service",
+            "sku": {
+                "name": "Developer",
+                "capacity": 1
+            },
+            "properties": {
+                "publisherEmail": "[parameters('adminEmail')]",
+                "publisherName": "[parameters('orgName')]"
+            },
+            "resources": [
+                {
+                    "apiVersion": "2019-12-01",
+                    "type": "loggers",
+                    "name": "[variables('funcName')]",
+                    "dependsOn": [
+                        "[concat('Microsoft.ApiManagement/service/', variables('apimName'))]"
+                    ],
+                    "properties": {
+                        "loggerType": "applicationInsights",
+                        "resourceId": "[variables('appInsightsId')]",
+                        "credentials": {
+                            "instrumentationKey": "[reference(variables('appInsightsId'), '2015-05-01').InstrumentationKey]"
+                        }
+                    }
+                },
+                {
+                    "apiVersion": "2019-12-01",
+                    "type": "diagnostics",
+                    "name": "applicationinsights",
+                    "dependsOn": [
+                        "[concat('Microsoft.ApiManagement/service/', variables('apimName'))]",
+                        "[concat('Microsoft.ApiManagement/service/', variables('apimName'), '/loggers/', variables('funcName'))]"
+                    ],
+                    "properties": {
+                        "loggerId": "[concat('/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/', variables('apimName'), '/loggers/', variables('funcName'))]",
+                        "alwaysLog": "allErrors",
+                        "sampling": {
+                            "percentage": 100,
+                            "samplingType": "fixed"
+                        }
+                    }
+                }
+            ]
+        },        
+        {
+            "type": "Microsoft.ServiceBus/namespaces",
+            "apiVersion": "2018-01-01-preview",
+            "name": "[variables('serviceBusName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard"
+            },
+            "properties": {},
+            "resources": [
+                {
+                    "type": "Queues",
+                    "apiVersion": "2017-04-01",
+                    "name": "detectlanguagequeue",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.ServiceBus/namespaces', variables('serviceBusName'))]"
+                    ],
+                    "properties": {
+                        "lockDuration": "PT5M",
+                        "maxSizeInMegabytes": 1024,
+                        "requiresDuplicateDetection": false,
+                        "requiresSession": false,
+                        "defaultMessageTimeToLive": "P10675199DT2H48M5.4775807S",
+                        "deadLetteringOnMessageExpiration": false,
+                        "duplicateDetectionHistoryTimeWindow": "PT10M",
+                        "maxDeliveryCount": 10,
+                        "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
+                        "enablePartitioning": false,
+                        "enableExpress": false
+                    }
+                },
+                {
+                    "type": "Queues",
+                    "apiVersion": "2017-04-01",
+                    "name": "processtextqueue",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.ServiceBus/namespaces', variables('serviceBusName'))]"
+                    ],
+                    "properties": {
+                        "lockDuration": "PT5M",
+                        "maxSizeInMegabytes": 1024,
+                        "requiresDuplicateDetection": false,
+                        "requiresSession": false,
+                        "defaultMessageTimeToLive": "P10675199DT2H48M5.4775807S",
+                        "deadLetteringOnMessageExpiration": false,
+                        "duplicateDetectionHistoryTimeWindow": "PT10M",
+                        "maxDeliveryCount": 10,
+                        "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
+                        "enablePartitioning": false,
+                        "enableExpress": false
+                    }
+                }            
+            ]
+        }        
     ],
     "outputs": {}
 }
