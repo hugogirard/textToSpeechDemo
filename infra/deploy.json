@@ -115,10 +115,7 @@
                     "dependsOn": [
                         "[concat('Microsoft.Web/sites/', variables('webAppName'))]"
                     ],                    
-                    "apiVersion": "2018-11-01",
-                    "properties": {
-                        "apiUri": "test"
-                    }
+                    "apiVersion": "2018-11-01"
                 }                
             ]            
         },
