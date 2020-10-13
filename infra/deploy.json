@@ -45,7 +45,8 @@
         "vnetCloudName": "vnet-cloud-services",
         "serviceBusName": "[concat('svb-',uniqueString(resourceGroup().id))]",
         "appInsightsId": "[resourceId('microsoft.insights/components',variables('funcName'))]",
-        "apimName": "[concat('apim-',uniqueString(resourceGroup().id))]"
+        "apimName": "[concat('apim-',uniqueString(resourceGroup().id))]",
+        "cognitiveText": "[concat('textapi-',uniqueString(resourceGroup().id))]"
     },
     "resources": [
         {
@@ -107,17 +108,7 @@
             "properties": {
                 "name": "[variables('webAppName')]",
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms',variables('appPlanName'))]"
-            },
-            "resources": [
-                {
-                    "name": "[concat(variables('webAppName'),'/appsettings')]",
-                    "type": "Microsoft.Web/sites/config",                    
-                    "dependsOn": [
-                        "[concat('Microsoft.Web/sites/', variables('webAppName'))]"
-                    ],                    
-                    "apiVersion": "2018-11-01"
-                }                
-            ]            
+            }          
         },
         {
             "name": "[variables('strName')]",
@@ -197,6 +188,19 @@
             "properties": {                
             }
         },
+        {
+            "apiVersion": "2017-04-18",
+            "name": "[variables('cognitiveText')]",
+            "location": "[resourceGroup().location]",
+            "type": "Microsoft.CognitiveServices/accounts",
+            "kind": "TextAnalytics",
+            "sku": {
+                "name": "S"
+            },
+            "properties": {
+                "customSubDomainName": "[variables('cognitiveText')]"
+            }
+        },        
         {
             "apiVersion": "2020-04-01",
             "kind": "GlobalDocumentDB",
