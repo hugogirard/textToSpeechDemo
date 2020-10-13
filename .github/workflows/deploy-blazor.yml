@@ -1,11 +1,11 @@
 name: Deploy Blazor Client
 
-on:
-  workflow_dispatch:
-  push:
-    paths:
-      - 'src/WebApp/**'
-      - .github/workflows/deploy-blazor.yml
+#on:
+#  workflow_dispatch:
+#  push:
+#    paths:
+#      - 'src/WebApp/**'
+#      - .github/workflows/deploy-blazor.yml
 
 env:
   RESOURCE_GROUP: speech-demo-rg
