@@ -42,4 +42,4 @@ jobs:
           resourceGroupName: ${{ env.RESOURCE_GROUP_NAME }}        
           template: infra/deploy.json          
           deploymentMode: Incremental
-          parameters: adminAADObjectId=${{ secrets.ADMIN_AAD_OBJECT_ID }} tenantIdAdminAAD=${{ secrets.ADMIN_AAD_TENANT_ID }}                     
+          parameters: adminAADObjectId=${{ secrets.ADMIN_AAD_OBJECT_ID }} tenantIdAdminAAD=${{ secrets.ADMIN_AAD_TENANT_ID }} adminEmail=${{ secrets.ADMIN_EMAIL }} orgName=${{ secrets.ADMIN_ORGANISATION }}
