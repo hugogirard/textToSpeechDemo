@@ -257,7 +257,7 @@
                     },
                     "defaultTtl": 86400
                 },
-                "options": { "throughput": 400 }
+                "options": { }
             }
         },        
         {
