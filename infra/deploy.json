@@ -46,7 +46,9 @@
         "serviceBusName": "[concat('svb-',uniqueString(resourceGroup().id))]",
         "appInsightsId": "[resourceId('microsoft.insights/components',variables('funcName'))]",
         "apimName": "[concat('apim-',uniqueString(resourceGroup().id))]",
-        "cognitiveText": "[concat('textapi-',uniqueString(resourceGroup().id))]"
+        "cognitiveText": "[concat('textapi-',uniqueString(resourceGroup().id))]",
+        "databaseName": "voicesystem",
+        "containerName": "jobs"
     },
     "resources": [
         {
@@ -229,6 +231,36 @@
             }
         },
         {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
+            "apiVersion": "2020-06-01-preview",
+            "name": "[concat(variables('cosmosDbName'), '/', variables('databaseName'))]",
+            "dependsOn": [ "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosDbName'))]" ],
+            "properties": {
+                "resource": {
+                "id": "[variables('databaseName')]"
+                }
+            }
+        },        
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+            "apiVersion": "2020-06-01-preview",
+            "name": "[concat(variables('cosmosDbName'), '/', variables('databaseName'), '/', variables('containerName'))]",
+            "dependsOn": [ "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosDbName'), variables('databaseName'))]" ],
+            "properties": {
+                "resource": {
+                    "id": "[variables('containerName')]",
+                    "partitionKey": {
+                        "paths": [
+                        "/createdBy"
+                        ],
+                        "kind": "Hash"
+                    },
+                    "defaultTtl": 86400
+                },
+                "options": { "throughput": 400 }
+            }
+        },        
+        {
             "name": "[variables('funcName')]",
             "type": "Microsoft.Web/sites",
             "apiVersion": "2018-11-01",
@@ -390,7 +422,7 @@
                 {
                     "type": "Queues",
                     "apiVersion": "2017-04-01",
-                    "name": "detectlanguagequeue",
+                    "name": "analyzetextqueue",
                     "dependsOn": [
                         "[resourceId('Microsoft.ServiceBus/namespaces', variables('serviceBusName'))]"
                     ],
