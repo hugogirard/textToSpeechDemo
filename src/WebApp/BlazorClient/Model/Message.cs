@@ -10,7 +10,7 @@ namespace BlazorClient.Model
     public class Message
     {
         [Required(ErrorMessage = "Please enter a message")]
-        [StringLength(100, ErrorMessage = "The message is too long")]
+        [StringLength(2000, ErrorMessage = "The message is too long")]
         [JsonProperty("TextToConvert")]
         public string Text { get; set; }
     }

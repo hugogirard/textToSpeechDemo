@@ -47,7 +47,9 @@
 
     public Dictionary<string, object> InputAttributes { get; set; } = new Dictionary<string, object>
 {
-        { "class", "form-control" }
+        { "class", "form-control" },
+        { "rows", "10" },
+        { "cols", "50" }
     };
 
     private void Cancel()
@@ -76,9 +78,9 @@
             AudioUri = await response.Content.ReadAsStringAsync();
             ShowAudioPanel = true;
         }
-        else 
-        { 
-        
+        else
+        {
+
         }
 
 
