@@ -1,0 +1,39 @@
+name: Deploy Blazor Client
+
+on:
+  workflow_dispatch:  
+  push:
+    branches:
+      - v2
+    paths:
+      - 'src/Services/Job.Api/**'
+      - .github/workflows/deploy-job-api.yml
+
+env:
+  RESOURCE_GROUP: speech-demo-qa-rg
+  JOB_API_NAME: job-api-4cmtfi77xas52
+
+jobs:
+  build-blazor-server:
+    runs-on: ubuntu-latest
+  
+    steps:
+      - uses: actions/checkout@v2
+                
+      - name: Azure Login
+        uses: Azure/login@v1.1
+        with:          
+          creds: ${{ secrets.SP_AZURE_CREDENTIALS }}          
+          enable-AzPSSession: false
+
+      - name: Building job api
+        uses: azure/appservice-build@v2
+
+      - name: Deploying job api to Azure
+        uses: azure/webapps-deploy@v1
+        with:
+          app-name: ${{ env.JOB_API_NAME }}
+          
+      - name: Azure logout
+        run: |
+          az logout
