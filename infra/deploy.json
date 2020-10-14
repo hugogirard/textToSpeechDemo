@@ -30,7 +30,9 @@
     "functions": [],
     "variables": {
         "appPlanName": "[concat('web-plan-speech-',uniqueString(resourceGroup().id))]",
+        "appPlanNameApi": "[concat('speech-api-',uniqueString(resourceGroup().id))]",        
         "webAppName": "[concat('front-end-demo-speech',uniqueString(resourceGroup().id))]",
+        "jobApiName": "[concat('job-api-',uniqueString(resourceGroup().id))]",
         "strName": "[uniqueString(resourceGroup().id)]",
         "strNameFunc": "[concat('funcstr',uniqueString(resourceGroup().id))]",
         "funcName": "[concat('func-api-speech-',uniqueString(resourceGroup().id))]",
@@ -70,6 +72,19 @@
                 "name": "[variables('appPlanName')]"
             }
         },
+        {
+            "name": "[variables('appPlanNameApi')]",
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2018-02-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "S1",
+                "capacity": 1
+            },
+            "properties": {
+                "name": "[variables('appPlanNameApi')]"
+            }
+        },        
         {
             "name": "[variables('signalRServiceName')]",
             "type": "Microsoft.SignalRService/SignalR",
@@ -112,6 +127,22 @@
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms',variables('appPlanName'))]"
             }          
         },
+        {
+            "name": "[variables('jobApiName')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2018-11-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('appPlanNameApi'))]"                
+            ],
+            "tags": {
+                "appname": "job-api"
+            },            
+            "properties": {
+                "name": "[variables('jobApiName')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms',variables('appPlanNameApi'))]"
+            }          
+        },        
         {
             "name": "[variables('strName')]",
             "type": "Microsoft.Storage/storageAccounts",
