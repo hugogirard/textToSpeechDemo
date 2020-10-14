@@ -1,11 +1,11 @@
 name: Deploy Infra
 
-on:
-  workflow_dispatch:
-  push:
-    paths:
-      - infra/*.json
-      - .github/workflows/deploy-infra.yml
+#on:
+#  workflow_dispatch:
+#  push:
+#    paths:
+#      - infra/*.json
+#      - .github/workflows/deploy-infra.yml
 
 env:
   RESOURCE_GROUP_NAME: speech-demo-rg
