@@ -25,16 +25,21 @@ jobs:
         with:          
           creds: ${{ secrets.SP_AZURE_CREDENTIALS }}          
           enable-AzPSSession: false
-
-      - name: Building job api
-        uses: azure/appservice-build@v2
-        with:
-          source-directory: 'src/Services/Job.Api/Job.Api.csproj'
+          
+      - name: getDirectoryFiles
+        run: |
+          ls src/Services
+          ls src/Services/Job.Api
+       
+      - name: Build
+        run: |
+          dotnet build src/Services/Job.Api/Job.Api.csproj -c Release -o output
 
       - name: Deploying job api to Azure
         uses: azure/webapps-deploy@v1
         with:
           app-name: ${{ env.JOB_API_NAME }}
+          package:  output
           
       - name: Azure logout
         run: |
