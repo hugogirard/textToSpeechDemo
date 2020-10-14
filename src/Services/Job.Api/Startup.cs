@@ -55,7 +55,19 @@ namespace Job.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseSwagger(c => c.SerializeAsV2 = true);
+            app.UseSwagger(c => 
+            { 
+                c.SerializeAsV2 = true;
+                c.PreSerializeFilters.Add((swaggerDoc, httpReq) => 
+                {
+                    swaggerDoc.Servers = new List<OpenApiServer>
+                    { new OpenApiServer
+                      {
+                        Url = $"{httpReq.Scheme}://{httpReq.Host.Value}"
+                      } 
+                    };
+                });
+            });
  
             app.UseSwaggerUI(c =>
             {
