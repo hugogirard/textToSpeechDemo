@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Job.Api.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class JobController : ControllerBase

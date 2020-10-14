@@ -15,6 +15,7 @@ using Microsoft.Identity.Web;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Identity.Web.UI;
+using BlazorClient.Services.Job;
 
 namespace BlazorClient
 {
@@ -31,12 +32,11 @@ namespace BlazorClient
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMicrosoftIdentityWebAppAuthentication(Configuration);
-            services.AddHttpClient(Infrastructure.Constants.Api.JOB_API, c => 
-            {
-                c.BaseAddress = new Uri(Configuration["Api:JobApi"]);
-                c.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Configuration["ApimKey"]);               
-            });
+            services.AddMicrosoftIdentityWebAppAuthentication(Configuration)
+                    .EnableTokenAcquisitionToCallDownstreamApi(new string[] { Configuration["TodoList:TodoListScope"] })
+                    .AddInMemoryTokenCaches();
+
+            services.AddHttpClient<IJobService,JobService>();
             services.AddSignalR().AddAzureSignalR(Configuration["SignalRService"]);
 
             services.AddControllersWithViews(options =>
