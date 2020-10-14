@@ -25,12 +25,7 @@ jobs:
         with:          
           creds: ${{ secrets.SP_AZURE_CREDENTIALS }}          
           enable-AzPSSession: false
-          
-      - name: getDirectoryFiles
-        run: |
-          ls src/Services
-          ls src/Services/Job.Api
-       
+                 
       - name: Build
         run: |
           dotnet restore
