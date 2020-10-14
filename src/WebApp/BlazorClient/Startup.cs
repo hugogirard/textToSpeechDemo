@@ -10,7 +10,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using BlazorClient.Infrastructure;
-
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Identity.Web;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.Identity.Web.UI;
 
 namespace BlazorClient
 {
@@ -27,19 +31,25 @@ namespace BlazorClient
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddRazorPages();
-            services.AddServerSideBlazor();
-            services.AddHttpClient(Constants.Api.JOB_API, c => 
+            services.AddMicrosoftIdentityWebAppAuthentication(Configuration);
+            services.AddHttpClient(Infrastructure.Constants.Api.JOB_API, c => 
             {
                 c.BaseAddress = new Uri(Configuration["Api:JobApi"]);
                 c.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Configuration["ApimKey"]);               
             });
-            //services.AddHttpClient("SpeechApi",c => 
-            //{
-            //    c.BaseAddress = new Uri(Configuration["SpeechApiUrl"]);
-            //});
             services.AddSignalR().AddAzureSignalR(Configuration["SignalRService"]);
 
+            services.AddControllersWithViews(options =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
+
+            }).AddMicrosoftIdentityUI();
+
+            services.AddRazorPages();
+            services.AddServerSideBlazor();
 
         }
 
@@ -61,6 +71,9 @@ namespace BlazorClient
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

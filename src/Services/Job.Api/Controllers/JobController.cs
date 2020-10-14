@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Shared.Repository.Document;
 using Shared.Services;
 using System;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Job.Api.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class JobController : ControllerBase
@@ -36,6 +38,12 @@ namespace Job.Api.Controllers
             await _queueService.SendMessageAsync(job);
 
             return Ok();
+        }
+
+        [HttpGet("test")]
+        public IActionResult Test() 
+        {
+            return new OkObjectResult("It works you have access");
         }
     }
 

@@ -15,11 +15,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorClient", "src\WebApp\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{77C35652-7869-42E1-8C46-63EA304F3691}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "src\Infrastructure\Shared\Shared.csproj", "{9450208D-E9F5-4B2E-9B0F-3BB1E0E16643}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "src\Infrastructure\Shared\Shared.csproj", "{9450208D-E9F5-4B2E-9B0F-3BB1E0E16643}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{55F10BBB-5529-40D9-A403-6689493DABC8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Job.Api", "src\Services\Job.Api\Job.Api.csproj", "{EEF8D082-1AD1-4A8A-99A2-2888091F8C8F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Job.Api", "src\Services\Job.Api\Job.Api.csproj", "{EEF8D082-1AD1-4A8A-99A2-2888091F8C8F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

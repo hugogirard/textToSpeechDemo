@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
 using Shared.Model;
 using Shared.Repository.Document;
@@ -32,6 +34,10 @@ namespace Job.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                    .AddMicrosoftIdentityWebApi(Configuration);
+
             services.AddSingleton<IDocumentRepository<Shared.Model.Job>,CosmosDbRepository<Shared.Model.Job>>();
             services.AddSingleton<IQueueService, ServiceBusQueueService>();
             services.AddControllers().AddNewtonsoftJson();
@@ -50,6 +56,13 @@ namespace Job.Api
                 c.IncludeXmlComments(xmlPath);
 
             });
+
+            services.AddCors(o => o.AddPolicy("default", builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+            }));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -80,10 +93,12 @@ namespace Job.Api
                 app.UseDeveloperExceptionPage();
             //}
 
+            app.UseCors("default");
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
