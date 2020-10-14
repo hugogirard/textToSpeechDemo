@@ -28,7 +28,8 @@ jobs:
           
       - name: getDirectoryFiles
         run: |
-          ls
+          ls src/Services
+          ls src/Services/Job.Api
           
       - name: Building job api
         uses: azure/appservice-build@v2
