@@ -33,6 +33,7 @@ namespace Job.Api.Controllers
         {
             job.Id = Guid.NewGuid().ToString();
             job.Created = DateTime.UtcNow;
+            job.Finished = null;
             job.CreatedBy = "298c0fc8-c578-43ba-a4da-47020a8a473e";
             job.JobStatus = Infrastructure.Shared.JobStatus.Created;
 
@@ -58,12 +59,6 @@ namespace Job.Api.Controllers
 
             return Ok(jobs);
         }
-
-        //[HttpGet("{createdBy}")]
-        //public async Task<IActionResult> GetJobs(string createdBy) 
-        //{ 
-        //    //string query = 
-        //}
     }
 
 
