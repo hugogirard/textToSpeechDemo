@@ -63,10 +63,10 @@ namespace Job.Api
                 c.RoutePrefix = string.Empty;
             });
 
-            if (env.IsDevelopment())
-            {
+            //if (env.IsDevelopment())
+            //{
                 app.UseDeveloperExceptionPage();
-            }
+            //}
 
             app.UseHttpsRedirection();
 
