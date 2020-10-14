@@ -1,0 +1,15 @@
+﻿@page "/jobs"
+
+<h3>Jobs</h3>
+@inject NavigationManager NavigationManager
+
+<button @onclick="CreateJob" class="btn btn-primary">Create Job</button>
+
+@code {
+
+    private void CreateJob()
+    {
+        NavigationManager.NavigateTo("/createJob");
+    }
+
+}

@@ -16,9 +16,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
-using Shared.Model;
-using Shared.Repository.Document;
-using Shared.Services;
+using Infrastructure.Shared.Model;
+using Infrastructure.Shared.Repository.Document;
+using Infrastructure.Shared.Services;
 
 namespace Job.Api
 {
@@ -38,7 +38,7 @@ namespace Job.Api
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddMicrosoftIdentityWebApi(Configuration);
 
-            services.AddSingleton<IDocumentRepository<Shared.Model.Job>,CosmosDbRepository<Shared.Model.Job>>();
+            services.AddSingleton<IDocumentRepository<Infrastructure.Shared.Model.Job>,CosmosDbRepository<Infrastructure.Shared.Model.Job>>();
             services.AddSingleton<IQueueService, ServiceBusQueueService>();
             services.AddControllers().AddNewtonsoftJson();
 

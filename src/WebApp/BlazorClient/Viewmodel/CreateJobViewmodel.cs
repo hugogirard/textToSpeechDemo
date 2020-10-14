@@ -7,5 +7,6 @@ namespace BlazorClient.Viewmodel
 {
     public class CreateJobViewmodel
     {
+        public string Text { get; set; }
     }
 }

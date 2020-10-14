@@ -1,16 +1,15 @@
 ﻿@page "/"
 
 @inject BlazorClient.Services.Job.IJobService jobService
-@attribute [Microsoft.Identity.Web.AuthorizeForScopes(ScopeKeySection = "Api:JobApiScope")]
 
 <h3>Welcome to the voice mail system</h3>
 
 @code { 
 
-    
-    protected override async Task OnInitializedAsync()
-    {
-        var result = await jobService.Test();
-    }
+
+    //protected override async Task OnInitializedAsync()
+    //{
+    //    var result = await jobService.Test();
+    //}
 
 }

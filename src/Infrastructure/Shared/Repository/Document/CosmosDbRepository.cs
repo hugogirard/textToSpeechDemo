@@ -1,12 +1,12 @@
 ﻿using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
-using Shared.Model;
+using Infrastructure.Shared.Model;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shared.Repository.Document
+namespace Infrastructure.Shared.Repository.Document
 {
     public class CosmosDbRepository<T> : IDocumentRepository<T> where T : IDocument
     {

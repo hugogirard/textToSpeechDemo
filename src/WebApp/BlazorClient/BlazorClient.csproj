@@ -16,4 +16,8 @@
     <Folder Include="wwwroot\css\font-awesome\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Infrastructure\Shared\Shared.csproj" />
+  </ItemGroup>
+
 </Project>

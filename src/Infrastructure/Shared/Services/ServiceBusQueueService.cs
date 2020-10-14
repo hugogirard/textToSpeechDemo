@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shared.Services
+namespace Infrastructure.Shared.Services
 {
     public class ServiceBusQueueService : IQueueService
     {

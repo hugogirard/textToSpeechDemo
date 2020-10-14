@@ -8,7 +8,7 @@ using Microsoft.Azure.WebJobs.Host;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Shared.Model;
+using Infrastructure.Shared.Model;
 
 namespace CognitiveApi
 {

@@ -1,0 +1,44 @@
+﻿@page "/createJob"
+@inject IJobService _jobService
+
+<Loading IsLoading="Loading"/>
+
+<div class="row">
+    <h1>Please enter your message to leave a voice mail</h1>
+</div>
+<div class="row">
+    <div class="col-md">
+        <EditForm Model="@VM" OnValidSubmit="@HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="form-group">
+                <label for="text">Message</label>
+                <InputTextArea @attributes="InputAttributes" id="text" @bind-Value="VM.Text" />
+            </div>
+
+            <button class="btn btn-primary" type="submit">Submit</button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+
+    public CreateJobViewmodel VM { get; set; } = new CreateJobViewmodel();
+
+    public string Text { get; set; }
+
+    public bool Loading { get; set; }
+
+    public Dictionary<string, object> InputAttributes { get; set; } = new Dictionary<string, object>
+    {
+        { "class", "form-control" }
+    };
+
+    private async Task HandleValidSubmit()
+    {
+        Loading = true;
+
+        var response = await _jobService.CreateJob(VM.Text);
+    }
+}

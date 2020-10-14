@@ -1,8 +1,8 @@
-﻿using Shared.Model;
+﻿using Infrastructure.Shared.Model;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Shared.Repository.Document
+namespace Infrastructure.Shared.Repository.Document
 {
     public interface IDocumentRepository<T> where T : IDocument
     {

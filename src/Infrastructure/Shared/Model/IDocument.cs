@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Shared.Model
+namespace Infrastructure.Shared.Model
 {
     public interface IDocument
     {

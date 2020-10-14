@@ -1,13 +1,16 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Identity.Web;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
+using SharedModel = Infrastructure.Shared.Model;
 
 namespace BlazorClient.Services.Job
 {
@@ -33,6 +36,25 @@ namespace BlazorClient.Services.Job
             _baseAddress = configuration["Api:JobApi"];
             _contextAccessor = contextAccessor;
             _apiAccessKey = configuration["Api:ApimKey"];
+        }
+
+        public async Task<string> CreateJob(string text)
+        {
+            var job = new SharedModel.Job { Text = text };
+
+            var jsonRequest = JsonConvert.SerializeObject(job);
+            var jsoncontent = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+            var response = await this._httpClient.PostAsync($"{ _baseAddress}/api/job", jsoncontent);
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                //todo = JsonConvert.DeserializeObject<ToDoItem>(content);
+
+                return string.Empty;
+            }
+
+            return string.Empty;
         }
 
         public async Task<string> Test()

@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Shared.Services
+namespace Infrastructure.Shared.Services
 {
     public interface IQueueService
     {
