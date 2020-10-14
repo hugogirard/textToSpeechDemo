@@ -75,7 +75,10 @@ namespace CognitiveApi
                 {
                     log.LogInformation("SpeechSynthesizer created");
 
-                    var result = await synthesizer.SpeakTextAsync(speechInfo.TextToConvert);
+                    //var result = await synthesizer.SpeakTextAsync(speechInfo.TextToConvert);
+                    var neuralText = WriteXmlFile(speechInfo.TextToConvert);
+
+                    var result = await synthesizer.SpeakSsmlAsync(neuralText);
 
                     log.LogInformation("Result for text to audio");
                     log.LogInformation($"Result reason {result.Reason}");
@@ -134,6 +137,20 @@ namespace CognitiveApi
             var result = new ObjectResult("Internal Server Error");
             result.StatusCode = StatusCodes.Status500InternalServerError;
             return result;
+        }
+
+        private static string WriteXmlFile(string text)
+        {
+
+            string audioTxt = @$"<speak version=""1.0"" xmlns=""http://www.w3.org/2001/10/synthesis"" xmlns:mstts=""https://www.w3.org/2001/mstts"" xml:lang=""en-US"">
+                                  <voice name=""en-US-JennyNeural"">
+                                    <mstts:express-as style=""chat"">
+                                      {text}
+                                    </mstts:express-as>
+                                  </voice>
+                                </speak>";
+
+            return audioTxt;
         }
     }
 }
