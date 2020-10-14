@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using BlazorClient.Infrastructure;
 
 
 namespace BlazorClient
@@ -28,10 +29,15 @@ namespace BlazorClient
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddHttpClient("SpeechApi",c => 
+            services.AddHttpClient(Constants.Api.JOB_API, c => 
             {
-                c.BaseAddress = new Uri(Configuration["SpeechApiUrl"]);
+                c.BaseAddress = new Uri(Configuration["Api:JobApi"]);
+                c.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Configuration["ApimKey"]);               
             });
+            //services.AddHttpClient("SpeechApi",c => 
+            //{
+            //    c.BaseAddress = new Uri(Configuration["SpeechApiUrl"]);
+            //});
             services.AddSignalR().AddAzureSignalR(Configuration["SignalRService"]);
 
 
