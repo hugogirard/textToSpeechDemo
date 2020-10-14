@@ -14,7 +14,7 @@ env:
   JOB_API_NAME: job-api-4cmtfi77xas52
 
 jobs:
-  build-blazor-server:
+  build-job-api:
     runs-on: ubuntu-latest
   
     steps:
@@ -33,7 +33,9 @@ jobs:
        
       - name: Build
         run: |
-          dotnet build src/Services/Job.Api/Job.Api.csproj -c Release -o output
+          dotnet restore
+          dotnet build src/Services/Job.Api/Job.Api.csproj -c Release
+          dotnet publish src/Services/Job.Api/Job.Api.csproj -c Release -o output
 
       - name: Deploying job api to Azure
         uses: azure/webapps-deploy@v1
