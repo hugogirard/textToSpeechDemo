@@ -30,11 +30,13 @@ jobs:
         uses: azure/appservice-build@v2
         with:
           source-directory: 'src/Services/Job.Api/Job.Api.csproj'
+          output-directory: 'output'
 
       - name: Deploying job api to Azure
         uses: azure/webapps-deploy@v1
         with:
           app-name: ${{ env.JOB_API_NAME }}
+          package:  output
           
       - name: Azure logout
         run: |
