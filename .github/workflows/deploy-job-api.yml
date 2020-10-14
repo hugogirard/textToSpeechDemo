@@ -1,4 +1,4 @@
-name: Deploy Blazor Client
+name: Deploy Job Api
 
 on:
   workflow_dispatch:  
@@ -28,6 +28,8 @@ jobs:
 
       - name: Building job api
         uses: azure/appservice-build@v2
+        with:
+          source-directory: 'src/Services/Job.Api/Job.Api.csproj'
 
       - name: Deploying job api to Azure
         uses: azure/webapps-deploy@v1
