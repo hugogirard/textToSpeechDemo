@@ -25,7 +25,11 @@ jobs:
         with:          
           creds: ${{ secrets.SP_AZURE_CREDENTIALS }}          
           enable-AzPSSession: false
-
+          
+      - name: getDirectoryFiles
+        run: |
+          ls
+          
       - name: Building job api
         uses: azure/appservice-build@v2
         with:
