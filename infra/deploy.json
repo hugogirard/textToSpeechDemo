@@ -50,7 +50,8 @@
         "apimName": "[concat('apim-',uniqueString(resourceGroup().id))]",
         "cognitiveText": "[concat('textapi-',uniqueString(resourceGroup().id))]",
         "databaseName": "voicesystem",
-        "containerName": "jobs"
+        "containerName": "jobs",
+        "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetCloudName'), 'apim-vnet')]"
     },
     "resources": [
         {
@@ -403,7 +404,11 @@
             },
             "properties": {
                 "publisherEmail": "[parameters('adminEmail')]",
-                "publisherName": "[parameters('orgName')]"
+                "publisherName": "[parameters('orgName')]",
+                "virtualNetworkType": "External",
+                "virtualNetworkConfiguration": {
+                    "subnetResourceId": "[variables('subnetRef')]"
+                }                
             },
             "resources": [
                 {
