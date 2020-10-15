@@ -51,7 +51,8 @@
         "cognitiveText": "[concat('textapi-',uniqueString(resourceGroup().id))]",
         "databaseName": "voicesystem",
         "containerName": "jobs",
-        "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetCloudName'), 'apim-vnet')]"
+        "subnetAPIMRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetCloudName'), 'apim-vnet')]",
+        "subnetWebAppRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetCloudName'), 'webApp')]"
     },
     "resources": [
         {
@@ -118,7 +119,8 @@
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', variables('appPlanName'))]",
-                "[resourceId('Microsoft.SignalRService/SignalR', variables('signalRServiceName'))]"
+                "[resourceId('Microsoft.SignalRService/SignalR', variables('signalRServiceName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetCloudName'))]"
             ],
             "tags": {
                 "appname": "wedtier-speech-demo-api"
@@ -126,7 +128,22 @@
             "properties": {
                 "name": "[variables('webAppName')]",
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms',variables('appPlanName'))]"
-            }          
+            },
+            "resources": [               
+                {
+                    "name": "virtualNetwork",
+                    "type": "config",
+                    "apiVersion": "2018-02-01",
+                    "location": "[resourceGroup().location]",
+                    "properties": {
+                        "subnetResourceid": "[variables('subnetWebAppRef')]",
+                        "swiftSupported": true
+                    },
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/sites', variables('jobApiName'))]"
+                    ]                    
+                }                
+            ]                        
         },
         {
             "name": "[variables('jobApiName')]",
@@ -142,7 +159,7 @@
             "properties": {
                 "name": "[variables('jobApiName')]",
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms',variables('appPlanNameApi'))]"
-            }          
+            }    
         },        
         {
             "name": "[variables('strName')]",
@@ -389,7 +406,13 @@
                         "properties": {
                             "addressPrefix": "10.0.0.0/24"
                         }
-                    }
+                    },
+                    {
+                        "name": "webApp",
+                        "properties": {
+                            "addressPrefix": "10.1.0.0/24"
+                        }
+                    }                    
                 ]
             }
         },
@@ -407,7 +430,7 @@
                 "publisherName": "[parameters('orgName')]",
                 "virtualNetworkType": "External",
                 "virtualNetworkConfiguration": {
-                    "subnetResourceId": "[variables('subnetRef')]"
+                    "subnetResourceId": "[variables('subnetAPIMRef')]"
                 }                
             },
             "resources": [
