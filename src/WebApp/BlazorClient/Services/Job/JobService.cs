@@ -38,7 +38,7 @@ namespace BlazorClient.Services.Job
             _apiAccessKey = configuration["Api:ApimKey"];
         }
 
-        public async Task<string> CreateJob(string text)
+        public async Task<SharedModel.Job> CreateJob(string text)
         {
             var job = new SharedModel.Job { Text = text };
 
@@ -49,12 +49,28 @@ namespace BlazorClient.Services.Job
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                //todo = JsonConvert.DeserializeObject<ToDoItem>(content);
+                var createdJob = JsonConvert.DeserializeObject<SharedModel.Job>(content);
 
-                return string.Empty;
+                return createdJob;
             }
 
-            return string.Empty;
+            return null;
+        }
+
+        public async Task<IEnumerable<SharedModel.Job>> GetJobsUser() 
+        {
+            var response = await this._httpClient.GetAsync($"{ _baseAddress}/api/job");
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var jobs = JsonConvert.DeserializeObject<IEnumerable<SharedModel.Job>>(content);
+
+                return jobs;
+            }
+
+            return null;
+
         }
 
         public async Task<string> Test()

@@ -23,7 +23,7 @@ namespace BlazorClient.Viewmodel
         public DateTime Created { get; set; }
 
         [JsonProperty(PropertyName = "finished")]
-        public DateTime Finished { get; set; }
+        public DateTime? Finished { get; set; }
 
         [JsonProperty(PropertyName = "jobStatus")]
         public JobStatus JobStatus { get; set; }

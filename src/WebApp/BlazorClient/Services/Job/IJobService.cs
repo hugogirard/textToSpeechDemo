@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using SharedModel = Infrastructure.Shared.Model;
 
 namespace BlazorClient.Services.Job
 {
@@ -6,6 +8,8 @@ namespace BlazorClient.Services.Job
     {
         Task<string> Test();
 
-        Task<string> CreateJob(string text);
+        Task<SharedModel.Job> CreateJob(string text);
+
+        Task<IEnumerable<SharedModel.Job>> GetJobsUser();
     }
 }
