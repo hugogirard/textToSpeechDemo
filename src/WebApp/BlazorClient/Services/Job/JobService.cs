@@ -59,6 +59,8 @@ namespace BlazorClient.Services.Job
 
         public async Task<IEnumerable<SharedModel.Job>> GetJobsUser() 
         {
+            await PrepareAuthenticatedClient();
+
             var response = await this._httpClient.GetAsync($"{ _baseAddress}/api/job");
 
             if (response.StatusCode == HttpStatusCode.OK)

@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Identity.Web.UI;
 using BlazorClient.Services.Job;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
 namespace BlazorClient
 {
@@ -32,8 +33,16 @@ namespace BlazorClient
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+
+            //services.AddOptions();
+            //services.Configure<OpenIdConnectOptions>(Configuration.GetSection("AzureAdB2C"));
+
+            //services.AddMicrosoftIdentityWebAppAuthentication(Configuration, "AzureAdB2C")
+            //        .EnableTokenAcquisitionToCallDownstreamApi(new string[] { Configuration["Api:JobApiScop"] })
+            //        .AddInMemoryTokenCaches();
+
             services.AddMicrosoftIdentityWebAppAuthentication(Configuration)
-                    .EnableTokenAcquisitionToCallDownstreamApi(new string[] { Configuration["TodoList:TodoListScope"] })
+                    .EnableTokenAcquisitionToCallDownstreamApi(new string[] { Configuration["Api:JobApiScop"] })
                     .AddInMemoryTokenCaches();
 
             services.AddHttpClient<IJobService,JobService>();
