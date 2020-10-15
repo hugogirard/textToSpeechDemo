@@ -23,7 +23,7 @@ namespace CognitiveApi
                 BlobName = blobName,
                 Resource = "b",
                 StartsOn = DateTimeOffset.UtcNow.AddMinutes(-5),
-                ExpiresOn = DateTimeOffset.UtcNow.AddDays(1)
+                ExpiresOn = DateTimeOffset.UtcNow.AddYears(1)
             };
             blobSasBuilder.SetPermissions(BlobSasPermissions.Read);
             return blobSasBuilder.ToSasQueryParameters(storageSharedKeyCredential).ToString();            

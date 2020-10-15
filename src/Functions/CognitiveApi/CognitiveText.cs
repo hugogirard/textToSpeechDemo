@@ -33,19 +33,46 @@ namespace CognitiveApi
 
 
         [FunctionName("DetectText")]
-        public static async Task Run([ServiceBusTrigger("analyzetextqueue", Connection = "ServiceBusCnxString")]string queueItem, 
-                                     ILogger log,
-                                     [CosmosDB(databaseName: "voicesystem",
-                                               collectionName: "jobs",
-                                               ConnectionStringSetting = "CosmosDBConnection")]IAsyncCollector<Job> jobs)
+        [return: ServiceBus("processtextqueue", Connection = "ServiceBusCnxString")]
+        public static async Task<string> Run([ServiceBusTrigger("analyzetextqueue", Connection = "ServiceBusCnxString")]string queueItem, 
+                                             ILogger log,
+                                             [CosmosDB(databaseName: "voicesystem",
+                                                       collectionName: "jobs",
+                                                       ConnectionStringSetting = "CosmosDBConnection")]IAsyncCollector<Job> jobs)
         {
             log.LogInformation($"C# ServiceBus queue trigger function processed message: {queueItem}");
 
             var job = JsonConvert.DeserializeObject<Job>(queueItem);
 
-            var response = await _textClient.DetectLanguageAsync(job.Text);
+            var response = await TextClient.DetectLanguageAsync(job.Text);
 
-            await jobs.AddAsync(job);
+            if (response.GetRawResponse().Status == 200) 
+            {
+                if (response.Value.Iso6391Name == "en" || response.Value.Iso6391Name == "fr")
+                {
+                    job.Language = response.Value.Iso6391Name;
+                    job.JobStatus = Infrastructure.Shared.JobStatus.Processing;
+                }
+                else
+                {
+                    job.JobStatus = Infrastructure.Shared.JobStatus.Error;
+                    job.Error = "Invalid language message, right now only english or french is supported";
+                }
+
+                await jobs.AddAsync(job);
+
+                return JsonConvert.SerializeObject(job);
+            }
+            else 
+            {
+                job.JobStatus = Infrastructure.Shared.JobStatus.Error;
+                job.Error = $"Cannot detect language, statusCode: {response.GetRawResponse().Status}";
+
+                await jobs.AddAsync(job);
+
+                return string.Empty;
+            }
+
         }
     }
 }
