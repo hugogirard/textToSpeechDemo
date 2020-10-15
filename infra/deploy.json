@@ -391,13 +391,7 @@
                         "properties": {
                             "addressPrefix": "10.0.0.0/24"
                         }
-                    },
-                    {
-                        "name": "webApp",
-                        "properties": {
-                            "addressPrefix": "10.1.0.0/24"
-                        }
-                    }                    
+                    }                   
                 ]
             }
         },
