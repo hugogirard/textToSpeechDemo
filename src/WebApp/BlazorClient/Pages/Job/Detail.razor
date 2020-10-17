@@ -1,0 +1,16 @@
+﻿@*@page "/messageDetail/{id:string}"*@ 
+@inject JobService _jobService  
+
+
+@code {
+
+    [Parameter]
+    public string Id { get; set; }
+
+    public int MyProperty { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        
+    }
+}

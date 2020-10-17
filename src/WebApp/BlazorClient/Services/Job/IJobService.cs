@@ -11,5 +11,7 @@ namespace BlazorClient.Services.Job
         Task<SharedModel.Job> CreateJob(string text);
 
         Task<IEnumerable<SharedModel.Job>> GetJobsUser();
+
+        Task<SharedModel.Job> GetJobDetail(string id);
     }
 }

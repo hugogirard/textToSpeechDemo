@@ -1,7 +1,8 @@
 ﻿@page "/createJob"
 @inject IJobService _jobService
+@inject IJSRuntime JSRuntime
 
-<Loading IsLoading="Loading"/>
+<Loading IsLoading="Loading" />
 
 <div class="row">
     <h1>Please enter your message to leave a voice mail</h1>
@@ -31,7 +32,7 @@
     public bool Loading { get; set; }
 
     public Dictionary<string, object> InputAttributes { get; set; } = new Dictionary<string, object>
-    {
+{
         { "class", "form-control" }
     };
 
@@ -40,5 +41,10 @@
         Loading = true;
 
         var response = await _jobService.CreateJob(VM.Text);
+
+        Loading = false;
+
+        await JSRuntime.InvokeVoidAsync("showToastr", $" Job {response.Id} created");
+
     }
 }

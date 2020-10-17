@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Identity.Web;
+using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -21,25 +23,28 @@ namespace BlazorClient.Services.Job
         private readonly IConfiguration _configuration;
         private readonly string _scope;
         private readonly string _baseAddress;
-        private readonly IHttpContextAccessor _contextAccessor;
+        private readonly MicrosoftIdentityConsentAndConditionalAccessHandler _handler;
         private readonly string _apiAccessKey;
 
         public JobService(HttpClient httpClient,
                           IConfiguration configuration,
                           ITokenAcquisition tokenAcquisition,
-                          IHttpContextAccessor contextAccessor)
+                          MicrosoftIdentityConsentAndConditionalAccessHandler identityHandler)
         {
             _httpClient = httpClient;
             _tokenAcquisition = tokenAcquisition;
             _configuration = configuration;
             _scope = configuration["Api:JobApiScope"];
             _baseAddress = configuration["Api:JobApi"];
-            _contextAccessor = contextAccessor;
-            _apiAccessKey = configuration["Api:ApimKey"];
+            _handler = identityHandler;
+            _apiAccessKey = configuration["Api:ApimKey"];            
         }
 
         public async Task<SharedModel.Job> CreateJob(string text)
         {
+            
+            await PrepareAuthenticatedClient();
+
             var job = new SharedModel.Job { Text = text };
 
             var jsonRequest = JsonConvert.SerializeObject(job);
@@ -60,7 +65,7 @@ namespace BlazorClient.Services.Job
         public async Task<IEnumerable<SharedModel.Job>> GetJobsUser() 
         {
             await PrepareAuthenticatedClient();
-
+          
             var response = await this._httpClient.GetAsync($"{ _baseAddress}/api/job");
 
             if (response.StatusCode == HttpStatusCode.OK)
@@ -73,6 +78,23 @@ namespace BlazorClient.Services.Job
 
             return null;
 
+        }
+
+        public async Task<SharedModel.Job> GetJobDetail(string id) 
+        {
+            await PrepareAuthenticatedClient();
+
+            var response = await this._httpClient.GetAsync($"{ _baseAddress}/api/job/{id}");
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var job = JsonConvert.DeserializeObject<SharedModel.Job>(content);
+
+                return job;
+            }
+
+            return null;
         }
 
         public async Task<string> Test()
@@ -91,11 +113,18 @@ namespace BlazorClient.Services.Job
 
         private async Task PrepareAuthenticatedClient()
         {
-            var accessToken = await _tokenAcquisition.GetAccessTokenForUserAsync(new[] { _scope });
+            try
+            {
+                var accessToken = await _tokenAcquisition.GetAccessTokenForUserAsync(new[] { _scope });
 
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-            _httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", _apiAccessKey);
-            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                _httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", _apiAccessKey);
+                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            }
+            catch (Exception ex)
+            {
+                _handler.HandleException(ex);
+            }
         }
     }
 }

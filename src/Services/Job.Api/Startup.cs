@@ -19,6 +19,8 @@ using Microsoft.OpenApi.Models;
 using Infrastructure.Shared.Model;
 using Infrastructure.Shared.Repository.Document;
 using Infrastructure.Shared.Services;
+using Microsoft.ApplicationInsights.Extensibility;
+using Job.Api.Extensions;
 
 namespace Job.Api
 {
@@ -41,6 +43,7 @@ namespace Job.Api
 
             services.AddSingleton<IDocumentRepository<Infrastructure.Shared.Model.Job>,CosmosDbRepository<Infrastructure.Shared.Model.Job>>();
             services.AddSingleton<IQueueService, ServiceBusQueueService>();
+            services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
             services.AddControllers().AddNewtonsoftJson();
 
             services.AddSwaggerGen(c => 

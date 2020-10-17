@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace Job.Api.Controllers
 {
@@ -34,7 +35,7 @@ namespace Job.Api.Controllers
             job.Id = Guid.NewGuid().ToString();
             job.Created = DateTime.UtcNow;
             job.Finished = null;
-            job.CreatedBy = "298c0fc8-c578-43ba-a4da-47020a8a473e";
+            job.CreatedBy = GetClaimName();
             job.JobStatus = Infrastructure.Shared.JobStatus.Created;
 
             await _repository.CreateAsync(job,job.CreatedBy);
@@ -51,13 +52,30 @@ namespace Job.Api.Controllers
         [ProducesResponseType(200, Type = typeof(IEnumerable<Infrastructure.Shared.Model.Job>))]
         public async Task<IActionResult> Get() 
         {
-            string id = "298c0fc8-c578-43ba-a4da-47020a8a473e";
+            string name = GetClaimName();
 
-            string query = $"SELECT * FROM jobs WHERE jobs.createdBy = '{id}'";
+            string query = $"SELECT * FROM jobs WHERE jobs.createdBy = '{name}'";
 
-            var jobs = await _repository.GetByQueryAsync(query, id);
+            var jobs = await _repository.GetByQueryAsync(query, name);
 
             return Ok(jobs);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Detail(string id) 
+        {
+            var job = await _repository.GetByIdAsync(id, GetClaimName());
+
+            return Ok(job);
+        }
+
+        private string GetClaimName() 
+        {
+            var claimsIdentity = User.Identity as ClaimsIdentity;
+
+            var claim = claimsIdentity.FindFirst("name");
+
+            return claim.Value;
         }
     }
 

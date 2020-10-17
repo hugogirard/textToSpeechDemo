@@ -1,87 +1,88 @@
 ﻿@page "/jobs"
 @inject IJobService _jobService
 @inject NavigationManager NavigationManager
+@inject MicrosoftIdentityConsentAndConditionalAccessHandler ConsentHandler
 
-<h3>Jobs</h3>
+    <h3>Jobs</h3>
 
-<Loading  IsLoading="Loading"/>
+    <Loading IsLoading="Loading" />
 
-<div class="row">
-    <button @onclick="CreateJob" class="btn btn-primary">Create Job</button>
-</div>
-@if (VM.Jobs != null) 
-{ 
-    <div class="row" style="margin-top: 25px;">
-        <div class="col-md">
-            <table class="table">
-                <thead class="thead-dark">
-                    <tr>
-                        <th scope="col">Id</th>
-                        <th scope="col">CreatedBy</th>
-                        <th scope="col">Created</th>
-                        <th scope="col">Finished</th>
-                        <th scope="col">JobStatus</th>
-                        <th scope="col">Language</th>
-                        <th scope="col"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var job in VM.Jobs)
-                    {
-                        <tr>
-                            <th>@job.Id</th>
-                            <th>@job.CreatedBy</th>
-                            <th>@job.Created</th>
-                            <th>@job.Finished</th>
-                            <th>@job.JobStatus.ToString()</th>
-                            <th>@job.Language</th>
-                            <th>
-                                <button @onclick="() => Detail(job.Id)" class="btn btn-primary">Detail</button>
-                            </th>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+    <div class="row">
+        <button @onclick="CreateJob" class="btn btn-primary">Create Job</button>
     </div>
-}
-
-@code {
-
-    public bool Loading { get; set; }
-
-    public JobListViewmodel VM { get; set; } = new JobListViewmodel();
-
-    protected override async Task OnInitializedAsync()
+    @if (VM.Jobs != null)
     {
-        Loading = true;
+        <div class="row" style="margin-top: 25px;">
+            <div class="col-md">
+                <table class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Id</th>
+                            <th scope="col">CreatedBy</th>
+                            <th scope="col">Created</th>
+                            <th scope="col">Finished</th>
+                            <th scope="col">JobStatus</th>
+                            <th scope="col">Language</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var job in VM.Jobs)
+                        {
+                            <tr>
+                                <th>@job.Id</th>
+                                <th>@job.CreatedBy</th>
+                                <th>@job.Created</th>
+                                <th>@job.Finished</th>
+                                <th>@job.JobStatus.ToString()</th>
+                                <th>@job.Language</th>
+                                <th>
+                                    <button @onclick="() => Detail(job.Id)" class="btn btn-primary">Detail</button>
+                                </th>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
 
-        var jobs = await _jobService.GetJobsUser();
+    @code {
 
-        if (jobs != null && jobs.Any())
+        public bool Loading { get; set; }
+
+        public JobListViewmodel VM { get; set; } = new JobListViewmodel();
+
+        protected override async Task OnInitializedAsync()
         {
-            VM.Jobs = jobs.Select(j => new JobListItem
+            Loading = true;
+
+            var jobs = await _jobService.GetJobsUser();
+
+            if (jobs != null && jobs.Any())
             {
-                Created = j.Created,
-                CreatedBy = j.CreatedBy,
-                Finished = j.Finished,
-                Id = j.Id,
-                JobStatus = j.JobStatus,
-                Language = j.Language
-            });
+                VM.Jobs = jobs.Select(j => new JobListItem
+                {
+                    Created = j.Created,
+                    CreatedBy = j.CreatedBy,
+                    Finished = j.Finished,
+                    Id = j.Id,
+                    JobStatus = j.JobStatus,
+                    Language = j.Language
+                });
+            }
+
+            Loading = false;
         }
 
-        Loading = false;
-    }
+        private void CreateJob()
+        {
+            NavigationManager.NavigateTo("/createJob");
+        }
 
-    private void CreateJob()
-    {
-        NavigationManager.NavigateTo("/createJob");
-    }
+        private async Task Detail(string id)
+        {
+            var job = await _jobService.GetJobDetail(id);
+        }
 
-    private void Detail(string id) 
-    { 
-    
     }
-
-}

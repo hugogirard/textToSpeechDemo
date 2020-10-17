@@ -17,6 +17,8 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Identity.Web.UI;
 using BlazorClient.Services.Job;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.ApplicationInsights.Extensibility;
+using BlazorClient.Extension;
 
 namespace BlazorClient
 {
@@ -34,31 +36,29 @@ namespace BlazorClient
         public void ConfigureServices(IServiceCollection services)
         {
 
-            //services.AddOptions();
-            //services.Configure<OpenIdConnectOptions>(Configuration.GetSection("AzureAdB2C"));
-
-            //services.AddMicrosoftIdentityWebAppAuthentication(Configuration, "AzureAdB2C")
-            //        .EnableTokenAcquisitionToCallDownstreamApi(new string[] { Configuration["Api:JobApiScop"] })
-            //        .AddInMemoryTokenCaches();
+            services.AddApplicationInsightsTelemetry();
 
             services.AddMicrosoftIdentityWebAppAuthentication(Configuration)
-                    .EnableTokenAcquisitionToCallDownstreamApi(new string[] { Configuration["Api:JobApiScop"] })
+                    .EnableTokenAcquisitionToCallDownstreamApi(new string[] { Configuration["Api:JobApiScope"] })
                     .AddInMemoryTokenCaches();
 
             services.AddHttpClient<IJobService,JobService>();
+            services.AddHttpContextAccessor();
+            services.AddSingleton<ITelemetryInitializer, TelemetryInitalizer>();
             services.AddSignalR().AddAzureSignalR(Configuration["SignalRService"]);
 
-            services.AddControllersWithViews(options =>
-            {
-                var policy = new AuthorizationPolicyBuilder()
-                    .RequireAuthenticatedUser()
-                    .Build();
-                options.Filters.Add(new AuthorizeFilter(policy));
+            services.AddControllersWithViews().AddMicrosoftIdentityUI();
 
-            }).AddMicrosoftIdentityUI();
+            services.AddAuthorization(options =>
+            {
+                // By default, all incoming requests will be authorized according to the default policy
+                options.FallbackPolicy = options.DefaultPolicy;
+            });
 
             services.AddRazorPages();
-            services.AddServerSideBlazor();
+
+            services.AddServerSideBlazor()
+                    .AddMicrosoftIdentityConsentHandler();
 
         }
 
@@ -86,6 +86,7 @@ namespace BlazorClient
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllers();
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });
