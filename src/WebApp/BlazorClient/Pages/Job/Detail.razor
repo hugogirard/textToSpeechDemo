@@ -21,7 +21,7 @@
                         <th>
                             @if (string.IsNullOrEmpty(AudioUri)) 
                             { 
-                                <AudioPanel AudioSource="@AudioUri" OnCancel="@Cancel" />
+                                <AudioPanel AudioSource="@AudioUri"  />
                             }
                             else 
                             { 
