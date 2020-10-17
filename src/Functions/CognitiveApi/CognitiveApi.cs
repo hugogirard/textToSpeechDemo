@@ -103,17 +103,17 @@ namespace CognitiveApi
                     await blob.UploadFromStreamAsync(ms);
 
                     // Get SAS
-                    string sas = ValetKey.GetSharedAccessReferenceView(filename,
-                                                                       Environment.GetEnvironmentVariable("StorageAccountName"),
-                                                                       "audiofiles");
+                    //string sas = ValetKey.GetSharedAccessReferenceView(filename,
+                    //                                                   Environment.GetEnvironmentVariable("StorageAccountName"),
+                    //                                                   "audiofiles");
 
-                    log.LogInformation($"Value of the SAS: {sas}");
+                    //log.LogInformation($"Value of the SAS: {sas}");
 
-                    blobUri = $"{blob.Uri}?{sas}";
+                    //blobUri = $"{blob.Uri}?{sas}";
 
                     log.LogInformation("Blob uploaded");
 
-                    job.BlobName = blobUri;
+                    job.BlobName = blob.Uri.ToString();
                     job.Finished = DateTime.UtcNow;
                     job.JobStatus = Infrastructure.Shared.JobStatus.Done;
                 }

@@ -1,16 +1,67 @@
-﻿@*@page "/messageDetail/{id:string}"*@ 
-@inject JobService _jobService  
+﻿@page "/messageDetail/{id}"
+@inject JobService _jobService
 
+@if (Job != null)
+{
+    <div class="row" style="margin-top: 25px;">
+        <div class="col-md">
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">CreatedBy</th>
+                        <th scope="col">Language</th>
+                        <th scope="col"></th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>                        
+                        <th>@Job.CreatedBy</th>                                              
+                        <th>@Job.Language</th>
+                        <th>
+                            @if (string.IsNullOrEmpty(AudioUri)) 
+                            { 
+                                <AudioPanel AudioSource="@AudioUri" OnCancel="@Cancel" />
+                            }
+                            else 
+                            { 
+                                <button @onclick="Play" class="btn btn-primary">Play</button>
+                            }
+                        </th>
+                        <th>
+                            <button @onclick="Download" class="btn btn-primary">Download</button>
+                        </th>
+                    </tr>                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
 
 @code {
 
     [Parameter]
     public string Id { get; set; }
 
-    public int MyProperty { get; set; }
+    public Job Job { get; set; }
+
+    public string AudioUri { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
+        var Job = await _jobService.GetJobDetail(Id);
+    }
+
+    private async Task Play()
+    {
+
+    }
+
+    private async Task Download()
+    {
+        if (string.IsNullOrEmpty(AudioUri)) 
+        { 
         
+        }
     }
 }
