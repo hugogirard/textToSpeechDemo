@@ -18,6 +18,7 @@ using BlazorClient.Services.Job;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.ApplicationInsights.Extensibility;
 using BlazorClient.Extension;
+using BlazorClient.Services.Valet;
 
 namespace BlazorClient
 {
@@ -38,7 +39,7 @@ namespace BlazorClient
             services.AddApplicationInsightsTelemetry();
 
             services.AddMicrosoftIdentityWebAppAuthentication(Configuration)
-                    .EnableTokenAcquisitionToCallDownstreamApi(new string[] { Configuration["Api:JobApiScope"] })
+                    .EnableTokenAcquisitionToCallDownstreamApi(new string[] { Configuration["Api:JobApiScope"]})                    
                     .AddInMemoryTokenCaches();
                     //.AddDistributedTokenCaches();
 
@@ -48,6 +49,8 @@ namespace BlazorClient
             //});
 
             services.AddHttpClient<IJobService,JobService>();
+            services.AddHttpClient<IValetService, ValetService>();
+
             services.AddHttpContextAccessor();
             services.AddSingleton<ITelemetryInitializer, TelemetryInitalizer>();
             services.AddSignalR().AddAzureSignalR(o => 

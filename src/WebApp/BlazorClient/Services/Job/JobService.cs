@@ -97,20 +97,6 @@ namespace BlazorClient.Services.Job
             return null;
         }
 
-        public async Task<string> Test()
-        {
-            //await PrepareAuthenticatedClient();
-            var response = await _httpClient.GetAsync($"{_baseAddress}/api/Job/test");
-
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                var content = await response.Content.ReadAsStringAsync();
-                return content;
-            }
-
-            throw new HttpRequestException($"Invalid status code in the HttpResponseMessage: {response.StatusCode}.");
-        }
-
         private async Task PrepareAuthenticatedClient()
         {
             try

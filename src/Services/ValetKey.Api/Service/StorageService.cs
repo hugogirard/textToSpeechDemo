@@ -12,19 +12,19 @@ namespace ValetKey.Api.Service
     public class StorageService : IStorageService
     {
         private readonly string _containerName;
-        private readonly BlobContainerClient _container;
+        private readonly BlobServiceClient _blobServiceClient;        
         private readonly StorageSharedKeyCredential _storageSharedKeyCredential;
 
         public StorageService(IConfiguration configuration)
         {
             _containerName = configuration["ContainerName"];
-            _container = new BlobContainerClient(configuration["StorageConnectionString"], _containerName);
-            _storageSharedKeyCredential = new StorageSharedKeyCredential(configuration["AccountName"], configuration["StorageKey"]);
+            _blobServiceClient = new BlobServiceClient(configuration["StorageConnectionString"]);            
+            _storageSharedKeyCredential = new StorageSharedKeyCredential(_blobServiceClient.AccountName, configuration["StorageKey"]);
         }
 
         public string GetBlobDownloadLink(string blobname)
         {
-            var blob = _container.GetBlobClient(blobname);
+            var blob = _blobServiceClient.GetBlobContainerClient(_containerName).GetBlobClient(blobname);
 
             var blobSasBuilder = new BlobSasBuilder
 

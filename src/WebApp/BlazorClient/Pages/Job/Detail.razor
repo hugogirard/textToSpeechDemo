@@ -1,5 +1,9 @@
 ﻿@page "/messageDetail/{id}"
 @inject IJobService _jobService
+@inject IValetService _valetService
+@inject IJSRuntime _jsRuntime 
+
+<Loading IsLoading="Loading" />
 
 @if (Job != null) 
 { 
@@ -47,13 +51,15 @@
     [Parameter]
     public string Id { get; set; }
 
+    public bool Loading { get; set; }
+
     public Job Job { get; set; }
 
     public string AudioUri { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        Job = await _jobService.GetJobDetail(Id);        
+        Job = await _jobService.GetJobDetail(Id);
     }
 
     private async Task Play()
@@ -65,7 +71,15 @@
     {
         if (string.IsNullOrEmpty(AudioUri))
         {
+            Loading = true;
 
+            string sas = await _valetService.GetSasFile(Job.BlobName);
+
+            AudioUri = sas;
+
+            Loading = false;
+
+            await _jsRuntime.InvokeVoidAsync("downloadFromUrl", AudioUri);
         }
     }
 }

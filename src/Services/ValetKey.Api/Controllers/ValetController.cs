@@ -44,5 +44,12 @@ namespace ValetKey.Api.Controllers
 
             return Ok(sas);
         }
+
+        [HttpGet("test")]
+        [AllowAnonymous]
+        public IActionResult Test() 
+        {
+            return Ok("it works");
+        }
     }
 }
