@@ -33,6 +33,7 @@ namespace Infrastructure.Shared.Model
 
         [JsonProperty(PropertyName = "error")]
         public string Error { get; set; }
+        public string BlobUri { get; set; }
     }
 
 }

@@ -1,6 +1,7 @@
 ﻿@page "/createJob"
 @inject IJobService _jobService
 @inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
 
 <Loading IsLoading="Loading" />
 
@@ -44,7 +45,9 @@
 
         Loading = false;
 
-        await JSRuntime.InvokeVoidAsync("showToastr", $" Job {response.Id} created");
+        //await JSRuntime.InvokeVoidAsync("showToastr", new object[] { $" Job {response.Id} created", ToastrFlag.Success });
+
+        NavigationManager.NavigateTo("/jobs");
 
     }
 }

@@ -40,11 +40,21 @@ namespace BlazorClient
             services.AddMicrosoftIdentityWebAppAuthentication(Configuration)
                     .EnableTokenAcquisitionToCallDownstreamApi(new string[] { Configuration["Api:JobApiScope"] })
                     .AddInMemoryTokenCaches();
+                    //.AddDistributedTokenCaches();
+
+            //services.AddStackExchangeRedisCache(options =>
+            //{
+            //    options.Configuration = Configuration["Redis:ConnectionString"];                
+            //});
 
             services.AddHttpClient<IJobService,JobService>();
             services.AddHttpContextAccessor();
             services.AddSingleton<ITelemetryInitializer, TelemetryInitalizer>();
-            services.AddSignalR().AddAzureSignalR(Configuration["SignalRService"]);
+            services.AddSignalR().AddAzureSignalR(o => 
+            {
+                o.ServerStickyMode = Microsoft.Azure.SignalR.ServerStickyMode.Required;
+                o.ConnectionString = Configuration["SignalRService"];
+            });
 
             services.AddControllersWithViews().AddMicrosoftIdentityUI();
 

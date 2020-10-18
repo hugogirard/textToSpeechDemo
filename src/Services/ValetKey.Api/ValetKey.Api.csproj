@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+     <TargetFrameworks>netcoreapp3.1; netcoreapp3.1</TargetFrameworks>
+     <UserSecretsId>33f49e95-e3b7-442a-b022-25fd6598d2df</UserSecretsId>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.6.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.15.0" />
+    <PackageReference Include="Microsoft.Identity.Web" Version="0.4.*-*" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.1" />
+	<PackageReference Include="Microsoft.Identity.Web" Version="1.1.0" />
+	<PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+  </ItemGroup>
+    <PropertyGroup>
+	    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+	    <NoWarn>$(NoWarn);1591</NoWarn>		
+    </PropertyGroup>
+</Project>
