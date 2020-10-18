@@ -25,14 +25,9 @@
                         <th>@Job.Text</th>
                         <th>@Job.Language</th>
                         <th>
-                            @if (!string.IsNullOrEmpty(AudioUri))
-                            {
-                                @*<AudioPanel AudioSource="@AudioUri" />*@
-                            }
-                            else
-                            {
-                                <button @onclick="Play" class="btn btn-primary">Play</button>
-                            }
+                            <audio controls>
+                                <source src="@AudioUri" />
+                            </audio>    
                         </th>
                         <th>
                             <button @onclick="Download" class="btn btn-primary">Download</button>
@@ -59,27 +54,20 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Job = await _jobService.GetJobDetail(Id);
-    }
+        Loading = true;
 
-    private async Task Play()
-    {
+        Job = await _jobService.GetJobDetail(Id);
+
+        string sas = await _valetService.GetSasFile(Job.BlobName);
+
+        AudioUri = sas;
+
+        Loading = false;
 
     }
 
     private async Task Download()
     {
-        if (string.IsNullOrEmpty(AudioUri))
-        {
-            Loading = true;
-
-            string sas = await _valetService.GetSasFile(Job.BlobName);
-
-            AudioUri = sas;
-
-            Loading = false;
-
-            await _jsRuntime.InvokeVoidAsync("downloadFromUrl", AudioUri);
-        }
+        await _jsRuntime.InvokeVoidAsync("downloadFromUrl", AudioUri);
     }
 }

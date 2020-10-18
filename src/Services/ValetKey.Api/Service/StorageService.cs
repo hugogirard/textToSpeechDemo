@@ -1,5 +1,6 @@
 ﻿using Azure.Storage;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Specialized;
 using Azure.Storage.Sas;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -12,20 +13,19 @@ namespace ValetKey.Api.Service
     public class StorageService : IStorageService
     {
         private readonly string _containerName;
-        private readonly BlobServiceClient _blobServiceClient;        
+        private readonly BlobContainerClient _containerClient;
         private readonly StorageSharedKeyCredential _storageSharedKeyCredential;
 
         public StorageService(IConfiguration configuration)
         {
-            _containerName = configuration["ContainerName"];
-            _blobServiceClient = new BlobServiceClient(configuration["StorageConnectionString"]);            
-            _storageSharedKeyCredential = new StorageSharedKeyCredential(_blobServiceClient.AccountName, configuration["StorageKey"]);
+            _containerName = configuration["ContainerName"];            
+            var blobServiceClient = new BlobServiceClient(configuration["StorageConnectionString"]);
+            _containerClient = blobServiceClient.GetBlobContainerClient(_containerName);
+            _storageSharedKeyCredential = new StorageSharedKeyCredential(blobServiceClient.AccountName, configuration["StorageKey"]);
         }
 
         public string GetBlobDownloadLink(string blobname)
-        {
-            var blob = _blobServiceClient.GetBlobContainerClient(_containerName).GetBlobClient(blobname);
-
+        {                        
             var blobSasBuilder = new BlobSasBuilder
 
             {
@@ -38,7 +38,8 @@ namespace ValetKey.Api.Service
             blobSasBuilder.SetPermissions(BlobSasPermissions.Read);
             var sas = blobSasBuilder.ToSasQueryParameters(_storageSharedKeyCredential).ToString();
 
-            return $"{blob.Uri}?{sas}";
+            return $"{_containerClient.GetBlockBlobClient(blobname).Uri}?{sas}";
+            
         }
     }
 }
