@@ -105,7 +105,7 @@ namespace CognitiveApi
                     log.LogInformation("Blob uploaded");
 
                     job.BlobName = filename;
-                    job.BlobUri = blob.Uri.ToString();
+                    job.BlobUri = filename;
                     job.Finished = DateTime.UtcNow;
                     job.JobStatus = Infrastructure.Shared.JobStatus.Done;
                 }
