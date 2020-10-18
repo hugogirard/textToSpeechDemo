@@ -40,13 +40,14 @@ namespace BlazorClient
 
             services.AddMicrosoftIdentityWebAppAuthentication(Configuration)
                     .EnableTokenAcquisitionToCallDownstreamApi(new string[] { Configuration["Api:JobApiScope"]})                    
-                    .AddInMemoryTokenCaches();
-                    //.AddDistributedTokenCaches();
+                    //.AddInMemoryTokenCaches();
+                    .AddDistributedTokenCaches();
 
-            //services.AddStackExchangeRedisCache(options =>
-            //{
-            //    options.Configuration = Configuration["Redis:ConnectionString"];                
-            //});
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.InstanceName = Configuration["Redis:Name"];
+                options.Configuration = Configuration["Redis:ConnectionString"];
+            });
 
             services.AddHttpClient<IJobService,JobService>();
             services.AddHttpClient<IValetService, ValetService>();
