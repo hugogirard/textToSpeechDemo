@@ -6,8 +6,8 @@ on:
     branches:
       - v2.1
     paths:
-      - infra/*.json
-      - .github/workflows/deploy-infra.yml
+      - 'infra/*.json'
+      - '.github/workflows/deploy-infra.yml'
 
 env: 
   RESOURCE_GROUP_NAME: speech-demo-qa-rg
