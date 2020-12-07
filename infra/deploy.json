@@ -143,9 +143,17 @@
             },            
             "properties": {
                 "name": "[variables('jobApiName')]",
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms',variables('appPlanNameApi'))]"
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms',variables('appPlanNameApi'))]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "ServiceBus:CnxString",
+                            "value": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/AuthorizationRules',variables('serviceBusName'),'RootManageSharedAccessKey'),'2015-08-01').primaryConnectionString]"
+                        }
+                    ]
+                }
             }    
-        },        
+        },              
         {
             "name": "[variables('strName')]",
             "type": "Microsoft.Storage/storageAccounts",
@@ -374,13 +382,13 @@
                 },
                 "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('funcPlanName'))]",
                 "clientAffinityEnabled": true
-            },
-            "identity": {
-                "type": "UserAssigned",
-                "userAssignedIdentities": {
-                    "[variables('identityID')]": { }
-                }
             }
+            // "identity": {
+            //     "type": "UserAssigned",
+            //     "userAssignedIdentities": {
+            //         "[variables('identityID')]": { }
+            //     }
+            // }
         },
         // {
         //     "name": "[variables('vnetCloudName')]",
