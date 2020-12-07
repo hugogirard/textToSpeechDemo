@@ -242,10 +242,10 @@
                             "name": "ContainerName",
                             "value": "audiofiles"
                         },
-                        {
-                            "name": "StorageConnectionString",
-                            "value": "[listConnectionStrings(resourceId('Microsoft.Storage/storageAccounts', variables('strName')), '2019-12-12').connectionStrings[0].connectionString]"
-                        },
+                        // {
+                        //     "name": "StorageConnectionString",
+                        //     "value": "[listConnectionStrings(resourceId('Microsoft.Storage/storageAccounts', variables('strName')), '2019-12-12').connectionStrings[0].connectionString]"
+                        // },
                         {
                             "name": "StorageKey",
                             "value": "[listKeys(variables('storageReferenceId'),'2019-04-01').keys[0].value]"
