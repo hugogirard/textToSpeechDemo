@@ -142,7 +142,15 @@
             },            
             "properties": {
                 "name": "[variables('webAppName')]",
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms',variables('appPlanName'))]"
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms',variables('appPlanName'))]",
+                "siteConfig": {
+                    "appSettings": [
+                        {                                    
+                            "name": "signalRCnxString",
+                            "value": "[listkeys(resourceId('Microsoft.SignalRService/SignalR', variables('signalRServiceName')), '2020-05-01').primaryConnectionString]"            
+                        }
+                    ]
+                }
             }                     
         },
         {
@@ -446,58 +454,58 @@
         //         ]
         //     }
         // },
-        // {
-        //     "apiVersion": "2019-12-01",
-        //     "name": "[variables('apimName')]",
-        //     "location": "[resourceGroup().location]",
-        //     "type": "Microsoft.ApiManagement/service",
-        //     "sku": {
-        //         "name": "Developer",
-        //         "capacity": 1
-        //     },
-        //     "properties": {
-        //         "publisherEmail": "[parameters('adminEmail')]",
-        //         "publisherName": "[parameters('orgName')]",
-        //         "virtualNetworkType": "External",
-        //         "virtualNetworkConfiguration": {
-        //             "subnetResourceId": "[variables('subnetAPIMRef')]"
-        //         }                
-        //     },
-        //     "resources": [
-        //         {
-        //             "apiVersion": "2019-12-01",
-        //             "type": "loggers",
-        //             "name": "[variables('funcName')]",
-        //             "dependsOn": [
-        //                 "[concat('Microsoft.ApiManagement/service/', variables('apimName'))]"
-        //             ],
-        //             "properties": {
-        //                 "loggerType": "applicationInsights",
-        //                 "resourceId": "[variables('appInsightsId')]",
-        //                 "credentials": {
-        //                     "instrumentationKey": "[reference(variables('appInsightsId'), '2015-05-01').InstrumentationKey]"
-        //                 }
-        //             }
-        //         },
-        //         {
-        //             "apiVersion": "2019-12-01",
-        //             "type": "diagnostics",
-        //             "name": "applicationinsights",
-        //             "dependsOn": [
-        //                 "[concat('Microsoft.ApiManagement/service/', variables('apimName'))]",
-        //                 "[concat('Microsoft.ApiManagement/service/', variables('apimName'), '/loggers/', variables('funcName'))]"
-        //             ],
-        //             "properties": {
-        //                 "loggerId": "[concat('/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/', variables('apimName'), '/loggers/', variables('funcName'))]",
-        //                 "alwaysLog": "allErrors",
-        //                 "sampling": {
-        //                     "percentage": 100,
-        //                     "samplingType": "fixed"
-        //                 }
-        //             }
-        //         }
-        //     ]
-        // },        
+        {
+            "apiVersion": "2019-12-01",
+            "name": "[variables('apimName')]",
+            "location": "[resourceGroup().location]",
+            "type": "Microsoft.ApiManagement/service",
+            "sku": {
+                "name": "Developer",
+                "capacity": 1
+            },
+            "properties": {
+                "publisherEmail": "[parameters('adminEmail')]",
+                "publisherName": "[parameters('orgName')]",
+                // "virtualNetworkType": "External",
+                // "virtualNetworkConfiguration": {
+                //     "subnetResourceId": "[variables('subnetAPIMRef')]"
+                // }                
+            },
+            "resources": [
+                {
+                    "apiVersion": "2019-12-01",
+                    "type": "loggers",
+                    "name": "[variables('funcName')]",
+                    "dependsOn": [
+                        "[concat('Microsoft.ApiManagement/service/', variables('apimName'))]"
+                    ],
+                    "properties": {
+                        "loggerType": "applicationInsights",
+                        "resourceId": "[variables('appInsightsId')]",
+                        "credentials": {
+                            "instrumentationKey": "[reference(variables('appInsightsId'), '2015-05-01').InstrumentationKey]"
+                        }
+                    }
+                },
+                {
+                    "apiVersion": "2019-12-01",
+                    "type": "diagnostics",
+                    "name": "applicationinsights",
+                    "dependsOn": [
+                        "[concat('Microsoft.ApiManagement/service/', variables('apimName'))]",
+                        "[concat('Microsoft.ApiManagement/service/', variables('apimName'), '/loggers/', variables('funcName'))]"
+                    ],
+                    "properties": {
+                        "loggerId": "[concat('/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/', variables('apimName'), '/loggers/', variables('funcName'))]",
+                        "alwaysLog": "allErrors",
+                        "sampling": {
+                            "percentage": 100,
+                            "samplingType": "fixed"
+                        }
+                    }
+                }
+            ]
+        },        
         {
             "type": "Microsoft.ServiceBus/namespaces",
             "apiVersion": "2018-01-01-preview",
