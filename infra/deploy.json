@@ -30,7 +30,8 @@
     "functions": [],
     "variables": {
         "appPlanName": "[concat('web-plan-speech-',uniqueString(resourceGroup().id))]",
-        "appPlanNameApi": "[concat('speech-api-',uniqueString(resourceGroup().id))]",        
+        "appPlanNameApi": "[concat('speech-api-',uniqueString(resourceGroup().id))]",   
+        "redisCacheName": "[concat('redis-',uniqueString(resourceGroup().id))]",
         "webAppName": "[concat('front-end-demo-speech',uniqueString(resourceGroup().id))]",
         "jobApiName": "[concat('job-api-',uniqueString(resourceGroup().id))]",
         "strName": "[uniqueString(resourceGroup().id)]",
@@ -111,7 +112,20 @@
             },
             "dependsOn": [],
             "tags": {}
-        },        
+        },   
+        {
+            "name": "[variables('redisCacheName')]",
+            "type": "Microsoft.Cache/Redis",
+            "apiVersion": "2019-07-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "sku": {
+                    "name": "Basic",
+                    "family": "C",
+                    "capacity": 0
+                }
+            }
+        },  
         {
             "name": "[variables('webAppName')]",
             "type": "Microsoft.Web/sites",
@@ -119,7 +133,8 @@
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', variables('appPlanName'))]",
-                "[resourceId('Microsoft.SignalRService/SignalR', variables('signalRServiceName'))]"
+                "[resourceId('Microsoft.SignalRService/SignalR', variables('signalRServiceName'))]",
+                "[resourceId('Microsoft.Cache/Redis',variables('redisCacheName'))]"
                 
             ],
             "tags": {
@@ -149,6 +164,26 @@
                         {
                             "name": "ServiceBus:CnxString",
                             "value": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/AuthorizationRules',variables('serviceBusName'),'RootManageSharedAccessKey'),'2015-08-01').primaryConnectionString]"
+                        },
+                        {
+                            "name": "ServiceBus:QueueName",
+                            "value": "analyzetextqueue"
+                        },
+                        {
+                            "name": "CosmosDB:Endpoint",
+                            "value": "[concat('https://',variables('cosmosDbName'),'.documents.azure.com:443/')]"
+                        },
+                        {
+                            "name": "CosmosDB:PrimaryKey",
+                            "value": "[listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosDbName')), '2015-04-08').primaryMasterKey]"
+                        },
+                        {
+                            "name": "CosmosDB:Database",
+                            "value": "[variables('databaseName')]"
+                        },
+                        {
+                            "name": "CosmosDB:Container",
+                            "value": "[variables('containerName')]"
                         }
                     ]
                 }
