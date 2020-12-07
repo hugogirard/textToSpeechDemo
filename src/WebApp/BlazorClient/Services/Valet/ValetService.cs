@@ -30,7 +30,7 @@ namespace BlazorClient.Services.Valet
             _scope = configuration["Api:ValetScope"];
             _baseAddress = configuration["Api:ValetApi"];
             _handler = identityHandler;
-            _apiAccessKey = configuration["Api:ApimKey"];
+            //_apiAccessKey = configuration["Api:ApimKey"];
         }
 
         public async Task<string> GetSasFile(string blobname)
@@ -55,7 +55,7 @@ namespace BlazorClient.Services.Valet
                 var accessToken = await _tokenAcquisition.GetAccessTokenForUserAsync(new[] { _scope });
 
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-                _httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", _apiAccessKey);
+                //_httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", _apiAccessKey);
                 _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             }
             catch (Exception ex)

@@ -52,6 +52,7 @@
         "cognitiveText": "[concat('textapi-',uniqueString(resourceGroup().id))]",
         "databaseName": "voicesystem",
         "containerName": "jobs",
+        "valetApiName": "[concat('valetapi-',uniqueString(resourceGroup().id))]",
         "subnetAPIMRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetCloudName'), 'apim-vnet')]",
         "subnetWebAppRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetCloudName'), 'webApp')]"
     },
@@ -148,7 +149,31 @@
                         {                                    
                             "name": "signalRCnxString",
                             "value": "[listkeys(resourceId('Microsoft.SignalRService/SignalR', variables('signalRServiceName')), '2020-05-01').primaryConnectionString]"            
-                        }
+                        },
+                        {
+                            "name": "Redis:Name",
+                            "value": "[variables('redisCacheName')]"
+                        },
+                        {
+                            "name": "Redis:ConnectionString",
+                            "value": "[listKeys(resourceId('Microsoft.Cache/Redis', variables('redisCacheName')), '2016-04-01').primaryKey]"
+                        },
+                        {
+                            "name": "Api:JobApi",
+                            "value": "[concat('https://',variables('jobApiName'),'.azurewebsites.net')]"
+                        },
+                        {
+                            "name": "Api:JobApiScope",
+                            "value": "JobApi.All"
+                        },
+                        {
+                            "name": "Api:ValetApi",
+                            "value": "[concat('https://',variables('valetApiName'),'.azurewebsites.net')]"
+                        },
+                        {
+                            "name": "Api:ValetScope",
+                            "value": "ValetApi.All"
+                        },
                     ]
                 }
             }                     
@@ -196,7 +221,39 @@
                     ]
                 }
             }    
-        },              
+        },       
+        {
+            "name": "[variables('valetApiName')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2018-11-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('appPlanNameApi'))]"                
+            ],
+            "tags": {
+                "appname": "job-api"
+            },            
+            "properties": {
+                "name": "[variables('valetApiName')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms',variables('appPlanNameApi'))]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "ContainerName",
+                            "value": "audiofiles"
+                        },
+                        {
+                            "name": "StorageConnectionString",
+                            "value": "[listConnectionStrings(resourceId('Microsoft.Storage/storageAccounts', variables('strName')), '2019-12-12').connectionStrings[0].connectionString]"
+                        },
+                        {
+                            "name": "StorageKey",
+                            "value": "[listKeys(variables('storageReferenceId'),'2019-04-01').keys[0].value]"
+                        }
+                    ]
+                }
+            }    
+        },               
         {
             "name": "[variables('strName')]",
             "type": "Microsoft.Storage/storageAccounts",
@@ -454,58 +511,58 @@
         //         ]
         //     }
         // },
-        {
-            "apiVersion": "2019-12-01",
-            "name": "[variables('apimName')]",
-            "location": "[resourceGroup().location]",
-            "type": "Microsoft.ApiManagement/service",
-            "sku": {
-                "name": "Developer",
-                "capacity": 1
-            },
-            "properties": {
-                "publisherEmail": "[parameters('adminEmail')]",
-                "publisherName": "[parameters('orgName')]",
-                // "virtualNetworkType": "External",
-                // "virtualNetworkConfiguration": {
-                //     "subnetResourceId": "[variables('subnetAPIMRef')]"
-                // }                
-            },
-            "resources": [
-                {
-                    "apiVersion": "2019-12-01",
-                    "type": "loggers",
-                    "name": "[variables('funcName')]",
-                    "dependsOn": [
-                        "[concat('Microsoft.ApiManagement/service/', variables('apimName'))]"
-                    ],
-                    "properties": {
-                        "loggerType": "applicationInsights",
-                        "resourceId": "[variables('appInsightsId')]",
-                        "credentials": {
-                            "instrumentationKey": "[reference(variables('appInsightsId'), '2015-05-01').InstrumentationKey]"
-                        }
-                    }
-                },
-                {
-                    "apiVersion": "2019-12-01",
-                    "type": "diagnostics",
-                    "name": "applicationinsights",
-                    "dependsOn": [
-                        "[concat('Microsoft.ApiManagement/service/', variables('apimName'))]",
-                        "[concat('Microsoft.ApiManagement/service/', variables('apimName'), '/loggers/', variables('funcName'))]"
-                    ],
-                    "properties": {
-                        "loggerId": "[concat('/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/', variables('apimName'), '/loggers/', variables('funcName'))]",
-                        "alwaysLog": "allErrors",
-                        "sampling": {
-                            "percentage": 100,
-                            "samplingType": "fixed"
-                        }
-                    }
-                }
-            ]
-        },        
+        // {
+        //     "apiVersion": "2019-12-01",
+        //     "name": "[variables('apimName')]",
+        //     "location": "[resourceGroup().location]",
+        //     "type": "Microsoft.ApiManagement/service",
+        //     "sku": {
+        //         "name": "Developer",
+        //         "capacity": 1
+        //     },
+        //     "properties": {
+        //         "publisherEmail": "[parameters('adminEmail')]",
+        //         "publisherName": "[parameters('orgName')]",
+        //         "virtualNetworkType": "External",
+        //         "virtualNetworkConfiguration": {
+        //             "subnetResourceId": "[variables('subnetAPIMRef')]"
+        //         }                
+        //     },
+        //     "resources": [
+        //         {
+        //             "apiVersion": "2019-12-01",
+        //             "type": "loggers",
+        //             "name": "[variables('funcName')]",
+        //             "dependsOn": [
+        //                 "[concat('Microsoft.ApiManagement/service/', variables('apimName'))]"
+        //             ],
+        //             "properties": {
+        //                 "loggerType": "applicationInsights",
+        //                 "resourceId": "[variables('appInsightsId')]",
+        //                 "credentials": {
+        //                     "instrumentationKey": "[reference(variables('appInsightsId'), '2015-05-01').InstrumentationKey]"
+        //                 }
+        //             }
+        //         },
+        //         {
+        //             "apiVersion": "2019-12-01",
+        //             "type": "diagnostics",
+        //             "name": "applicationinsights",
+        //             "dependsOn": [
+        //                 "[concat('Microsoft.ApiManagement/service/', variables('apimName'))]",
+        //                 "[concat('Microsoft.ApiManagement/service/', variables('apimName'), '/loggers/', variables('funcName'))]"
+        //             ],
+        //             "properties": {
+        //                 "loggerId": "[concat('/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/', variables('apimName'), '/loggers/', variables('funcName'))]",
+        //                 "alwaysLog": "allErrors",
+        //                 "sampling": {
+        //                     "percentage": 100,
+        //                     "samplingType": "fixed"
+        //                 }
+        //             }
+        //         }
+        //     ]
+        // },        
         {
             "type": "Microsoft.ServiceBus/namespaces",
             "apiVersion": "2018-01-01-preview",

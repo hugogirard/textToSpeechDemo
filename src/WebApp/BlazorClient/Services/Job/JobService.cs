@@ -37,7 +37,7 @@ namespace BlazorClient.Services.Job
             _scope = configuration["Api:JobApiScope"];
             _baseAddress = configuration["Api:JobApi"];
             _handler = identityHandler;
-            _apiAccessKey = configuration["Api:ApimKey"];            
+            //_apiAccessKey = configuration["Api:ApimKey"];            
         }
 
         public async Task<SharedModel.Job> CreateJob(string text)
@@ -104,7 +104,7 @@ namespace BlazorClient.Services.Job
                 var accessToken = await _tokenAcquisition.GetAccessTokenForUserAsync(new[] { _scope });
 
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-                _httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", _apiAccessKey);
+                //_httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", _apiAccessKey);
                 _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             }
             catch (Exception ex)
