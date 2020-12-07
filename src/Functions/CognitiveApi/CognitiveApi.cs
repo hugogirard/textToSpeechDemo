@@ -20,9 +20,7 @@ namespace CognitiveApi
     public static class CognitiveApi
     {
         private static SpeechConfig _config;
-
-        private static ValetKey ValetKey => new ValetKey();
-
+        
         private static SpeechConfig SpeechConfig
         {
             get
@@ -51,8 +49,7 @@ namespace CognitiveApi
             log.LogInformation("Processing request text to speech.");
 
             var job = JsonConvert.DeserializeObject<Job>(queueItem);
-
-            string blobUri;
+            
             bool errorProcess = false;
             try
             {
