@@ -1,4 +1,4 @@
-name: Deploy Job Api
+name: Deploy ValetKey Api
 # Trigger
 on:
   workflow_dispatch:  
@@ -14,7 +14,7 @@ env:
   VALET_API_NAME: valetapi-4cmtfi77xas52
 
 jobs:
-  build-job-api:
+  build-valetkey-api:
     runs-on: ubuntu-latest
   
     steps:
