@@ -244,7 +244,7 @@
                         },
                         {
                             "name": "StorageConnectionString",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('strName'), ';AccountKey=', listKeys(resourceId(parameters('resourceGroupName'),'Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-04-01').keys[0].value,';EndpointSuffix=core.windows.net')]"
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('strName'), ';AccountKey=', listKeys(resourceId(resourceGroup().name,'Microsoft.Storage/storageAccounts', resourceGroup().name), '2019-04-01').keys[0].value,';EndpointSuffix=core.windows.net')]"
                         },
                         {
                             "name": "StorageKey",
