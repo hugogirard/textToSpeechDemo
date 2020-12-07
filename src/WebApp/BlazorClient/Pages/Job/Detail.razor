@@ -1,0 +1,73 @@
+﻿@page "/messageDetail/{id}"
+@inject IJobService _jobService
+@inject IValetService _valetService
+@inject IJSRuntime _jsRuntime 
+
+<Loading IsLoading="Loading" />
+
+@if (Job != null) 
+{ 
+    <div class="row" style="margin-top: 25px;">
+        <div class="col-md">
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">CreatedBy</th>
+                        <th scope="col">Text</th>
+                        <th scope="col">Language</th>
+                        <th scope="col"></th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>@Job.CreatedBy</th>
+                        <th>@Job.Text</th>
+                        <th>@Job.Language</th>
+                        <th>
+                            <audio controls>
+                                <source src="@AudioUri" />
+                            </audio>    
+                        </th>
+                        <th>
+                            <button @onclick="Download" class="btn btn-primary">Download</button>
+                        </th>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+
+
+@code {
+
+    [Parameter]
+    public string Id { get; set; }
+
+    public bool Loading { get; set; }
+
+    public Job Job { get; set; }
+
+    public string AudioUri { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Loading = true;
+
+        Job = await _jobService.GetJobDetail(Id);
+
+        string sas = await _valetService.GetSasFile(Job.BlobName);
+
+        AudioUri = sas;
+
+        Loading = false;
+
+    }
+
+    private async Task Download()
+    {
+        await _jsRuntime.InvokeVoidAsync("downloadFromUrl", AudioUri);
+    }
+}

@@ -9,7 +9,16 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Identity.Web;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.Identity.Web.UI;
+using BlazorClient.Services.Job;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.ApplicationInsights.Extensibility;
+using BlazorClient.Extension;
+using BlazorClient.Services.Valet;
 
 namespace BlazorClient
 {
@@ -26,18 +35,43 @@ namespace BlazorClient
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddRazorPages();
-            services.AddServerSideBlazor();
-            services.AddHttpClient("SpeechApi",c => 
+
+            services.AddApplicationInsightsTelemetry();
+
+            services.AddMicrosoftIdentityWebAppAuthentication(Configuration)
+                    .EnableTokenAcquisitionToCallDownstreamApi(new string[] { Configuration["Api:JobApiScope"]})                    
+                    //.AddInMemoryTokenCaches();
+                    .AddDistributedTokenCaches();
+
+            services.AddStackExchangeRedisCache(options =>
             {
-                c.BaseAddress = new Uri(Configuration["SpeechApiUrl"]);
+                options.InstanceName = Configuration["Redis:Name"];
+                options.Configuration = Configuration["Redis:ConnectionString"];
             });
-            //services.AddSignalR().AddAzureSignalR(options =>
-            //{
-            //    options.ConnectionString = "SignalRService";
-            //    options.ServerStickyMode =
-            //        Microsoft.Azure.SignalR.ServerStickyMode.Required;
-            //});
+
+            services.AddHttpClient<IJobService,JobService>();
+            services.AddHttpClient<IValetService, ValetService>();
+
+            services.AddHttpContextAccessor();
+            services.AddSingleton<ITelemetryInitializer, TelemetryInitalizer>();
+            services.AddSignalR().AddAzureSignalR(o => 
+            {
+                o.ServerStickyMode = Microsoft.Azure.SignalR.ServerStickyMode.Required;
+                o.ConnectionString = Configuration["SignalRService"];
+            });
+
+            services.AddControllersWithViews().AddMicrosoftIdentityUI();
+
+            services.AddAuthorization(options =>
+            {
+                // By default, all incoming requests will be authorized according to the default policy
+                options.FallbackPolicy = options.DefaultPolicy;
+            });
+
+            services.AddRazorPages();
+
+            services.AddServerSideBlazor()
+                    .AddMicrosoftIdentityConsentHandler();
 
         }
 
@@ -60,8 +94,12 @@ namespace BlazorClient
 
             app.UseRouting();
 
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllers();
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });

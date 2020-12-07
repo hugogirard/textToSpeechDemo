@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@page "/message"
 @inject IHttpClientFactory _httpClientFactory
 
 <Loading IsLoading="@Loading"/>
@@ -46,10 +46,8 @@
     public string AudioUri { get; set; }
 
     public Dictionary<string, object> InputAttributes { get; set; } = new Dictionary<string, object>
-{
-        { "class", "form-control" },
-        { "rows", "10" },
-        { "cols", "50" }
+    {
+        { "class", "form-control" }
     };
 
     private void Cancel()
@@ -78,9 +76,9 @@
             AudioUri = await response.Content.ReadAsStringAsync();
             ShowAudioPanel = true;
         }
-        else
-        {
-
+        else 
+        { 
+        
         }
 
 

@@ -13,13 +13,13 @@ using CognitiveApi.Model;
 using Microsoft.CognitiveServices.Speech.Audio;
 using Microsoft.Azure.Storage.Queue.Protocol;
 using System.Runtime.CompilerServices;
+using Infrastructure.Shared.Model;
 
 namespace CognitiveApi
 {
     public static class CognitiveApi
     {
         private static SpeechConfig _config;
-        private static ILogger _log;
 
         private static ValetKey ValetKey => new ValetKey();
 
@@ -33,10 +33,6 @@ namespace CognitiveApi
                 string endpoint = Environment.GetEnvironmentVariable("CognitiveServiceEndpoint");
                 string subscriptionKey = Environment.GetEnvironmentVariable("CognitiveServiceSubscriptionKey");
 
-                _log.LogInformation($"CognitiveServiceEndpoint : {endpoint}");
-                _log.LogInformation($"CognitiveServiceSubscriptionKey: {subscriptionKey}");
-
-
                 _config = SpeechConfig.FromEndpoint(new Uri(endpoint), subscriptionKey);
                 _config.SetSpeechSynthesisOutputFormat(SpeechSynthesisOutputFormat.Riff24Khz16BitMonoPcm);
                 return _config;
@@ -44,42 +40,31 @@ namespace CognitiveApi
         }
 
         [FunctionName("TextToAudio")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
-            [Blob("audiofiles", FileAccess.ReadWrite, Connection = "UploadVoiceTextStorage")] CloudBlobContainer container,
-            ILogger log)
+        public static async Task Run([ServiceBusTrigger("processtextqueue", Connection = "ServiceBusCnxString")] string queueItem,
+                                     [CosmosDB(databaseName: "voicesystem",
+                                               collectionName: "jobs",
+                                               ConnectionStringSetting = "CosmosDBConnection")]IAsyncCollector<Job> jobs,
+                                     [Blob("audiofiles", FileAccess.ReadWrite, Connection = "UploadVoiceTextStorage")] CloudBlobContainer container,
+                                     ILogger log)
         {
-            _log = log;
+
             log.LogInformation("Processing request text to speech.");
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-
-            if (string.IsNullOrEmpty(requestBody))
-            {
-                return new BadRequestObjectResult("The body cannot be empty, pass the text you need to convert to audio file");
-            }
-
-            var speechInfo = JsonConvert.DeserializeObject<SpeechInfo>(requestBody);
-
-            if (string.IsNullOrEmpty(speechInfo.TextToConvert))
-            {
-                return new BadRequestObjectResult("The SpeechInfo object is missing mandatory parameters");
-            }
+            var job = JsonConvert.DeserializeObject<Job>(queueItem);
 
             string blobUri;
+            bool errorProcess = false;
             try
             {
                 MemoryStream ms = null;
-                
                 using (var synthesizer = new SpeechSynthesizer(SpeechConfig, null))
                 {
                     log.LogInformation("SpeechSynthesizer created");
 
-                    //var result = await synthesizer.SpeakTextAsync(speechInfo.TextToConvert);
-                    var neuralText = WriteXmlFile(speechInfo.TextToConvert);
+                    var text = WriteXmlFile(job.Text, job.Language);
 
-                    var result = await synthesizer.SpeakSsmlAsync(neuralText);
-
+                    var result = await synthesizer.SpeakSsmlAsync(text);
+                           
                     log.LogInformation("Result for text to audio");
                     log.LogInformation($"Result reason {result.Reason}");
 
@@ -92,7 +77,11 @@ namespace CognitiveApi
                         if (cancellation.Reason == CancellationReason.Error)
                         {
                             log.LogError($"ErrorCode={cancellation.ErrorCode} - ErrorDetails={cancellation.ErrorDetails}");
-                            return CreateErrorResponse();
+
+                            job.Error = $"ErrorCode={cancellation.ErrorCode} - ErrorDetails={cancellation.ErrorDetails}";
+                            job.JobStatus = Infrastructure.Shared.JobStatus.Error;
+                            job.Finished = DateTime.UtcNow;
+                            errorProcess = true;
                         }
                     }
 
@@ -101,49 +90,46 @@ namespace CognitiveApi
                     ms = new MemoryStream(result.AudioData);
                 }
 
-                string filename = $"{Guid.NewGuid()}.wav";
+                if (!errorProcess) 
+                {
+                    string filename = $"{Guid.NewGuid()}.wav";
 
-                log.LogInformation("Getting blob reference");
+                    log.LogInformation("Getting blob reference");
 
-                var blob = container.GetBlockBlobReference(filename);
+                    var blob = container.GetBlockBlobReference(filename);
 
-                log.LogInformation("Uploading to blob reference");
+                    log.LogInformation("Uploading to blob reference");
 
-                await blob.UploadFromStreamAsync(ms);
+                    await blob.UploadFromStreamAsync(ms);
 
-                // Get SAS
-                string sas = ValetKey.GetSharedAccessReferenceView(filename,
-                                                                   Environment.GetEnvironmentVariable("StorageAccountName"),
-                                                                   "audiofiles");
+                    log.LogInformation("Blob uploaded");
 
-                log.LogInformation($"Value of the SAS: {sas}");
+                    job.BlobName = filename;
+                    job.BlobUri = blob.Uri.ToString();
+                    job.Finished = DateTime.UtcNow;
+                    job.JobStatus = Infrastructure.Shared.JobStatus.Done;
+                }
 
-                blobUri = $"{blob.Uri}?{sas}";
-
-                log.LogInformation("Blob uploaded");
+                
             }
             catch (Exception ex)
             {
-                throw ex;
-                //log.LogError("Cannot process text to audio file", ex);
-                //return CreateErrorResponse();
+                job.Error = ex.Message;
+                job.JobStatus = Infrastructure.Shared.JobStatus.Error;
+                job.Finished = DateTime.UtcNow;
             }
 
-            return new OkObjectResult(blobUri);
+            await jobs.AddAsync(job);
         }
 
-        private static IActionResult CreateErrorResponse()
-        {
-            var result = new ObjectResult("Internal Server Error");
-            result.StatusCode = StatusCodes.Status500InternalServerError;
-            return result;
-        }
-
-        private static string WriteXmlFile(string text)
+        private static string WriteXmlFile(string text, string language)
         {
 
-            string audioTxt = @$"<speak version=""1.0"" xmlns=""http://www.w3.org/2001/10/synthesis"" xmlns:mstts=""https://www.w3.org/2001/mstts"" xml:lang=""en-US"">
-                                  <voice name=""en-US-JennyNeural"">
+            string lang = language == "en" ? "en-US" : "fr-CA";
+            string voice = language == "en" ? "en-US-JennyNeural" : "fr-CA-Caroline";
+
+            string audioTxt = @$"<speak version=""1.0"" xmlns=""http://www.w3.org/2001/10/synthesis"" xmlns:mstts=""https://www.w3.org/2001/mstts"" xml:lang=""{lang}"">
+                                  <voice name=""{voice}"">
                                     <mstts:express-as style=""chat"">
                                       {text}
                                     </mstts:express-as>
@@ -151,6 +137,13 @@ namespace CognitiveApi
                                 </speak>";
 
             return audioTxt;
+        }
+
+        private static IActionResult CreateErrorResponse()
+        {
+            var result = new ObjectResult("Internal Server Error");
+            result.StatusCode = StatusCodes.Status500InternalServerError;
+            return result;
         }
     }
 }

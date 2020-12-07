@@ -1,11 +1,16 @@
 name: Deploy Functions
+# Hey
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - v2.1
+    paths:
+      - 'src/Functions/**'
+      - .github/workflows/deploy-function.yml
 
-#on:
-#  workflow_dispatch:
-#  push:
-#    paths:
-#      - 'src/Functions/**'
-#      - .github/workflows/deploy-function.yml
+env:
+  FUNC_NAME: func-api-speech-4cmtfi77xas52
 
 jobs:
   build-azure-functions:
@@ -52,15 +57,9 @@ jobs:
         with:          
           creds: ${{ secrets.SP_AZURE_CREDENTIALS }}          
           enable-AzPSSession: false
-          
-      - name: get azure function name
-        run: |
-         export FUNC_NAME=$(az resource list --tag 'appname=function-speech-demo-api' --query [0].name)
-         echo "::set-env name=FUNC_NAME::$FUNC_NAME"
-                 
+                           
       - name: Azure Functions Action
         uses: Azure/functions-action@v1.1.5
         with:
           # Name of the Azure Function App
           app-name: ${{ env.FUNC_NAME }}
-          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}

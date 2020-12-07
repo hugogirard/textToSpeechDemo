@@ -1,15 +1,16 @@
 name: Deploy Blazor Client
 
-#on:
-#  workflow_dispatch:
-#  push:
-#    paths:
-#      - 'src/WebApp/**'
-#      - .github/workflows/deploy-blazor.yml
+on:
+  workflow_dispatch:  
+  push:
+    branches:
+      - v2.1
+    paths:
+      - 'src/WebApp/**'
+      - .github/workflows/deploy-blazor.yml
 
-env:
-  RESOURCE_GROUP: speech-demo-rg
-  WEB_APP_NAME: front-end-demo-speecheydjiqdi56wcs
+env: 
+  WEB_APP_NAME: front-end-demo-speech4cmtfi77xas52
 
 jobs:
   build-blazor-server:
@@ -23,14 +24,18 @@ jobs:
         with:          
           creds: ${{ secrets.SP_AZURE_CREDENTIALS }}          
           enable-AzPSSession: false
+                 
+      - name: Build
+        run: |
+          dotnet restore
+          dotnet build src/WebApp/BlazorClient/BlazorClient.csproj -c Release
+          dotnet publish src/WebApp/BlazorClient/BlazorClient.csproj -c Release -o output
 
-      - name: Building web app
-        uses: azure/appservice-build@v2
-
-      - name: Deploying web app to Azure
+      - name: Deploying job api to Azure
         uses: azure/webapps-deploy@v1
         with:
           app-name: ${{ env.WEB_APP_NAME }}
+          package:  output
           
       - name: Azure logout
         run: |

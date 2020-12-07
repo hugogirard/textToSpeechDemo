@@ -13,12 +13,26 @@
             "metadata": { 
                 "description": "Tenant ID of the Admin Group or User to give access to key vault"
             }
-        }
+        },
+        "adminEmail": {
+            "type": "string",
+            "metadata": {
+                "description": "The admin email of the APIM"
+            }
+        },
+        "orgName": {
+            "type": "string",
+            "metadata": {
+                "description": "The organization name"
+            }
+        }        
     },
     "functions": [],
     "variables": {
         "appPlanName": "[concat('web-plan-speech-',uniqueString(resourceGroup().id))]",
+        "appPlanNameApi": "[concat('speech-api-',uniqueString(resourceGroup().id))]",        
         "webAppName": "[concat('front-end-demo-speech',uniqueString(resourceGroup().id))]",
+        "jobApiName": "[concat('job-api-',uniqueString(resourceGroup().id))]",
         "strName": "[uniqueString(resourceGroup().id)]",
         "strNameFunc": "[concat('funcstr',uniqueString(resourceGroup().id))]",
         "funcName": "[concat('func-api-speech-',uniqueString(resourceGroup().id))]",
@@ -28,7 +42,17 @@
         "signalRServiceName": "[concat('signalr-',uniqueString(resourceGroup().id))]",
         "cognitiveServiceId": "[resourceId('Microsoft.CognitiveServices/accounts',variables('speechApiName'))]",
         "identityID": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('userAssignedIdentity'))]",
-        "storageReferenceId": "[resourceId('Microsoft.Storage/storageAccounts',variables('strName'))]"        
+        "storageReferenceId": "[resourceId('Microsoft.Storage/storageAccounts',variables('strName'))]",
+        "cosmosDbName": "[concat('cosmosdb-',uniqueString(resourceGroup().id))]",
+        "vnetCloudName": "vnet-cloud-services",
+        "serviceBusName": "[concat('svb-',uniqueString(resourceGroup().id))]",
+        "appInsightsId": "[resourceId('microsoft.insights/components',variables('funcName'))]",
+        "apimName": "[concat('apim-',uniqueString(resourceGroup().id))]",
+        "cognitiveText": "[concat('textapi-',uniqueString(resourceGroup().id))]",
+        "databaseName": "voicesystem",
+        "containerName": "jobs",
+        "subnetAPIMRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetCloudName'), 'apim-vnet')]",
+        "subnetWebAppRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetCloudName'), 'webApp')]"
     },
     "resources": [
         {
@@ -50,6 +74,19 @@
                 "name": "[variables('appPlanName')]"
             }
         },
+        {
+            "name": "[variables('appPlanNameApi')]",
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2018-02-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "S1",
+                "capacity": 1
+            },
+            "properties": {
+                "name": "[variables('appPlanNameApi')]"
+            }
+        },        
         {
             "name": "[variables('signalRServiceName')]",
             "type": "Microsoft.SignalRService/SignalR",
@@ -83,6 +120,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', variables('appPlanName'))]",
                 "[resourceId('Microsoft.SignalRService/SignalR', variables('signalRServiceName'))]"
+                
             ],
             "tags": {
                 "appname": "wedtier-speech-demo-api"
@@ -90,20 +128,24 @@
             "properties": {
                 "name": "[variables('webAppName')]",
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms',variables('appPlanName'))]"
-            },
-            "resources": [
-                {
-                    "name": "[concat(variables('webAppName'),'/appsettings')]",
-                    "type": "Microsoft.Web/sites/config",                    
-                    "dependsOn": [
-                        "[concat('Microsoft.Web/sites/', variables('webAppName'))]"
-                    ],                    
-                    "apiVersion": "2018-11-01",
-                    "properties": {                        
-                    }
-                }                
-            ]            
-        },      
+            }                     
+        },
+        {
+            "name": "[variables('jobApiName')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2018-11-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('appPlanNameApi'))]"                
+            ],
+            "tags": {
+                "appname": "job-api"
+            },            
+            "properties": {
+                "name": "[variables('jobApiName')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms',variables('appPlanNameApi'))]"
+            }    
+        },        
         {
             "name": "[variables('strName')]",
             "type": "Microsoft.Storage/storageAccounts",
@@ -126,17 +168,6 @@
                 "[concat('Microsoft.Storage/storageAccounts/', variables('strName'))]"
             ]
         },        
-        {
-            "name": "[concat(variables('strName'),'/default/speechConfig')]",
-            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-            "apiVersion": "2019-06-01",
-            "properties": {
-                "publicAccess": "None"
-            },
-            "dependsOn": [
-                "[concat('Microsoft.Storage/storageAccounts/', variables('strName'))]"
-            ]
-        },          
         {
             "apiVersion": "2015-05-01",
             "name": "[variables('funcName')]",
@@ -188,11 +219,81 @@
             "type": "Microsoft.CognitiveServices/accounts",
             "kind": "SpeechServices",
             "sku": {
-                "name": "F0"
+                "name": "S0"
             },
             "properties": {                
             }
-        },    
+        },
+        {
+            "apiVersion": "2017-04-18",
+            "name": "[variables('cognitiveText')]",
+            "location": "[resourceGroup().location]",
+            "type": "Microsoft.CognitiveServices/accounts",
+            "kind": "TextAnalytics",
+            "sku": {
+                "name": "S"
+            },
+            "properties": {
+                "customSubDomainName": "[variables('cognitiveText')]"
+            }
+        },        
+        {
+            "apiVersion": "2020-04-01",
+            "kind": "GlobalDocumentDB",
+            "type": "Microsoft.DocumentDb/databaseAccounts",
+            "name": "[variables('cosmosDbName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "databaseAccountOfferType": "Standard",
+                "locations": [
+                    {
+                        "id": "[concat(variables('cosmosDbName'), '-', resourceGroup().location)]",
+                        "failoverPriority": 0,
+                        "locationName": "[resourceGroup().location]"
+                    }
+                ],
+                "isVirtualNetworkFilterEnabled": false,
+                "virtualNetworkRules": [],
+                "ipRules": [],
+                "dependsOn": [],
+                "capabilities": [
+                    {
+                        "name": "EnableServerless"
+                    }
+                ],
+                "enableFreeTier": false
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
+            "apiVersion": "2020-06-01-preview",
+            "name": "[concat(variables('cosmosDbName'), '/', variables('databaseName'))]",
+            "dependsOn": [ "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosDbName'))]" ],
+            "properties": {
+                "resource": {
+                "id": "[variables('databaseName')]"
+                }
+            }
+        },        
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+            "apiVersion": "2020-06-01-preview",
+            "name": "[concat(variables('cosmosDbName'), '/', variables('databaseName'), '/', variables('containerName'))]",
+            "dependsOn": [ "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosDbName'), variables('databaseName'))]" ],
+            "properties": {
+                "resource": {
+                    "id": "[variables('containerName')]",
+                    "partitionKey": {
+                        "paths": [
+                        "/createdBy"
+                        ],
+                        "kind": "Hash"
+                    },
+                    "defaultTtl": 86400
+                },
+                "options": { }
+            }
+        },        
         {
             "name": "[variables('funcName')]",
             "type": "Microsoft.Web/sites",
@@ -272,7 +373,134 @@
                     "[variables('identityID')]": { }
                 }
             }
-        }
+        },
+        {
+            "name": "[variables('vnetCloudName')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2019-11-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.0.0.0/16"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "apim-vnet",
+                        "properties": {
+                            "addressPrefix": "10.0.0.0/24"
+                        }
+                    }                   
+                ]
+            }
+        },
+        {
+            "apiVersion": "2019-12-01",
+            "name": "[variables('apimName')]",
+            "location": "[resourceGroup().location]",
+            "type": "Microsoft.ApiManagement/service",
+            "sku": {
+                "name": "Developer",
+                "capacity": 1
+            },
+            "properties": {
+                "publisherEmail": "[parameters('adminEmail')]",
+                "publisherName": "[parameters('orgName')]",
+                "virtualNetworkType": "External",
+                "virtualNetworkConfiguration": {
+                    "subnetResourceId": "[variables('subnetAPIMRef')]"
+                }                
+            },
+            "resources": [
+                {
+                    "apiVersion": "2019-12-01",
+                    "type": "loggers",
+                    "name": "[variables('funcName')]",
+                    "dependsOn": [
+                        "[concat('Microsoft.ApiManagement/service/', variables('apimName'))]"
+                    ],
+                    "properties": {
+                        "loggerType": "applicationInsights",
+                        "resourceId": "[variables('appInsightsId')]",
+                        "credentials": {
+                            "instrumentationKey": "[reference(variables('appInsightsId'), '2015-05-01').InstrumentationKey]"
+                        }
+                    }
+                },
+                {
+                    "apiVersion": "2019-12-01",
+                    "type": "diagnostics",
+                    "name": "applicationinsights",
+                    "dependsOn": [
+                        "[concat('Microsoft.ApiManagement/service/', variables('apimName'))]",
+                        "[concat('Microsoft.ApiManagement/service/', variables('apimName'), '/loggers/', variables('funcName'))]"
+                    ],
+                    "properties": {
+                        "loggerId": "[concat('/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/', variables('apimName'), '/loggers/', variables('funcName'))]",
+                        "alwaysLog": "allErrors",
+                        "sampling": {
+                            "percentage": 100,
+                            "samplingType": "fixed"
+                        }
+                    }
+                }
+            ]
+        },        
+        {
+            "type": "Microsoft.ServiceBus/namespaces",
+            "apiVersion": "2018-01-01-preview",
+            "name": "[variables('serviceBusName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard"
+            },
+            "properties": {},
+            "resources": [
+                {
+                    "type": "Queues",
+                    "apiVersion": "2017-04-01",
+                    "name": "analyzetextqueue",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.ServiceBus/namespaces', variables('serviceBusName'))]"
+                    ],
+                    "properties": {
+                        "lockDuration": "PT5M",
+                        "maxSizeInMegabytes": 1024,
+                        "requiresDuplicateDetection": false,
+                        "requiresSession": false,
+                        "defaultMessageTimeToLive": "P10675199DT2H48M5.4775807S",
+                        "deadLetteringOnMessageExpiration": false,
+                        "duplicateDetectionHistoryTimeWindow": "PT10M",
+                        "maxDeliveryCount": 10,
+                        "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
+                        "enablePartitioning": false,
+                        "enableExpress": false
+                    }
+                },
+                {
+                    "type": "Queues",
+                    "apiVersion": "2017-04-01",
+                    "name": "processtextqueue",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.ServiceBus/namespaces', variables('serviceBusName'))]"
+                    ],
+                    "properties": {
+                        "lockDuration": "PT5M",
+                        "maxSizeInMegabytes": 1024,
+                        "requiresDuplicateDetection": false,
+                        "requiresSession": false,
+                        "defaultMessageTimeToLive": "P10675199DT2H48M5.4775807S",
+                        "deadLetteringOnMessageExpiration": false,
+                        "duplicateDetectionHistoryTimeWindow": "PT10M",
+                        "maxDeliveryCount": 10,
+                        "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
+                        "enablePartitioning": false,
+                        "enableExpress": false
+                    }
+                }            
+            ]
+        }        
     ],
     "outputs": {}
 }
