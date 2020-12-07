@@ -1,0 +1,43 @@
+name: Deploy Job Api
+# Trigger
+on:
+  workflow_dispatch:  
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/Services/ValetKey.Api/**'
+      - .github/workflows/deploy-valet-api.yml
+
+env:
+  RESOURCE_GROUP: speech-demo-qa-rg
+  VALET_API_NAME: valetapi-4cmtfi77xas52
+
+jobs:
+  build-job-api:
+    runs-on: ubuntu-latest
+  
+    steps:
+      - uses: actions/checkout@v2
+                
+      - name: Azure Login
+        uses: Azure/login@v1.1
+        with:          
+          creds: ${{ secrets.SP_AZURE_CREDENTIALS }}          
+          enable-AzPSSession: false
+                 
+      - name: Build
+        run: |
+          dotnet restore
+          dotnet build src/Services/ValetKey.Api/ValetKey.Api.csproj -c Release
+          dotnet publish src/Services/ValetKey.Api/ValetKey.Api.csproj -c Release -o output
+
+      - name: Deploying valetkey api to Azure
+        uses: azure/webapps-deploy@v1
+        with:
+          app-name: ${{ env.VALET_API_NAME }}
+          package:  output
+          
+      - name: Azure logout
+        run: |
+          az logout

@@ -43,9 +43,3 @@ jobs:
           template: infra/deploy.json          
           deploymentMode: Incremental
           parameters: adminAADObjectId=${{ secrets.ADMIN_AAD_OBJECT_ID }} tenantIdAdminAAD=${{ secrets.ADMIN_AAD_TENANT_ID }} adminEmail=${{ secrets.ADMIN_EMAIL }} orgName=${{ secrets.ADMIN_ORGANISATION }}
-
-      # - name: Create Azure AD App
-      #   run: |
-      #     id=$(az resource list --tag 'appname=wedtier-speech-demo-api' --query [0].id)
-      #     hostname=$(az webapp show --ids $id --query defaultHostName)
-      #     result=$(az ad app create --display-name blazor-web-client --identifier-uris https://$hostname)
