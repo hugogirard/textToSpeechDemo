@@ -7,7 +7,7 @@ on:
       - main
     paths:
       - 'src/Services/ValetKey.Api/**'
-      - .github/workflows/deploy-valet-api.yml
+      - '.github/workflows/deploy-valet-api.yml'
 
 env:
   RESOURCE_GROUP: speech-demo-qa-rg
