@@ -326,6 +326,14 @@
                             "value": "[listKeys(variables('cognitiveServiceId'),'2017-04-18').key1]"
                         },
                         {
+                            "name": "ServiceBusCnxString",
+                            "value": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/AuthorizationRules',variables('serviceBusName'),'RootManageSharedAccessKey'),'2015-08-01').primaryConnectionString]"
+                        },
+                        {
+                            "name": "CosmosDBConnection",
+                            "value": "[listConnectionStrings(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosDbName')), '2019-12-12').connectionStrings[0].connectionString]"
+                        },
+                        {
                             "name": "StorageAccountName",
                             "value": "[variables('strName')]"
                         },
@@ -374,79 +382,79 @@
                 }
             }
         },
-        {
-            "name": "[variables('vnetCloudName')]",
-            "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "2019-11-01",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "addressSpace": {
-                    "addressPrefixes": [
-                        "10.0.0.0/16"
-                    ]
-                },
-                "subnets": [
-                    {
-                        "name": "apim-vnet",
-                        "properties": {
-                            "addressPrefix": "10.0.0.0/24"
-                        }
-                    }                   
-                ]
-            }
-        },
-        {
-            "apiVersion": "2019-12-01",
-            "name": "[variables('apimName')]",
-            "location": "[resourceGroup().location]",
-            "type": "Microsoft.ApiManagement/service",
-            "sku": {
-                "name": "Developer",
-                "capacity": 1
-            },
-            "properties": {
-                "publisherEmail": "[parameters('adminEmail')]",
-                "publisherName": "[parameters('orgName')]",
-                "virtualNetworkType": "External",
-                "virtualNetworkConfiguration": {
-                    "subnetResourceId": "[variables('subnetAPIMRef')]"
-                }                
-            },
-            "resources": [
-                {
-                    "apiVersion": "2019-12-01",
-                    "type": "loggers",
-                    "name": "[variables('funcName')]",
-                    "dependsOn": [
-                        "[concat('Microsoft.ApiManagement/service/', variables('apimName'))]"
-                    ],
-                    "properties": {
-                        "loggerType": "applicationInsights",
-                        "resourceId": "[variables('appInsightsId')]",
-                        "credentials": {
-                            "instrumentationKey": "[reference(variables('appInsightsId'), '2015-05-01').InstrumentationKey]"
-                        }
-                    }
-                },
-                {
-                    "apiVersion": "2019-12-01",
-                    "type": "diagnostics",
-                    "name": "applicationinsights",
-                    "dependsOn": [
-                        "[concat('Microsoft.ApiManagement/service/', variables('apimName'))]",
-                        "[concat('Microsoft.ApiManagement/service/', variables('apimName'), '/loggers/', variables('funcName'))]"
-                    ],
-                    "properties": {
-                        "loggerId": "[concat('/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/', variables('apimName'), '/loggers/', variables('funcName'))]",
-                        "alwaysLog": "allErrors",
-                        "sampling": {
-                            "percentage": 100,
-                            "samplingType": "fixed"
-                        }
-                    }
-                }
-            ]
-        },        
+        // {
+        //     "name": "[variables('vnetCloudName')]",
+        //     "type": "Microsoft.Network/virtualNetworks",
+        //     "apiVersion": "2019-11-01",
+        //     "location": "[resourceGroup().location]",
+        //     "properties": {
+        //         "addressSpace": {
+        //             "addressPrefixes": [
+        //                 "10.0.0.0/16"
+        //             ]
+        //         },
+        //         "subnets": [
+        //             {
+        //                 "name": "apim-vnet",
+        //                 "properties": {
+        //                     "addressPrefix": "10.0.0.0/24"
+        //                 }
+        //             }                   
+        //         ]
+        //     }
+        // },
+        // {
+        //     "apiVersion": "2019-12-01",
+        //     "name": "[variables('apimName')]",
+        //     "location": "[resourceGroup().location]",
+        //     "type": "Microsoft.ApiManagement/service",
+        //     "sku": {
+        //         "name": "Developer",
+        //         "capacity": 1
+        //     },
+        //     "properties": {
+        //         "publisherEmail": "[parameters('adminEmail')]",
+        //         "publisherName": "[parameters('orgName')]",
+        //         "virtualNetworkType": "External",
+        //         "virtualNetworkConfiguration": {
+        //             "subnetResourceId": "[variables('subnetAPIMRef')]"
+        //         }                
+        //     },
+        //     "resources": [
+        //         {
+        //             "apiVersion": "2019-12-01",
+        //             "type": "loggers",
+        //             "name": "[variables('funcName')]",
+        //             "dependsOn": [
+        //                 "[concat('Microsoft.ApiManagement/service/', variables('apimName'))]"
+        //             ],
+        //             "properties": {
+        //                 "loggerType": "applicationInsights",
+        //                 "resourceId": "[variables('appInsightsId')]",
+        //                 "credentials": {
+        //                     "instrumentationKey": "[reference(variables('appInsightsId'), '2015-05-01').InstrumentationKey]"
+        //                 }
+        //             }
+        //         },
+        //         {
+        //             "apiVersion": "2019-12-01",
+        //             "type": "diagnostics",
+        //             "name": "applicationinsights",
+        //             "dependsOn": [
+        //                 "[concat('Microsoft.ApiManagement/service/', variables('apimName'))]",
+        //                 "[concat('Microsoft.ApiManagement/service/', variables('apimName'), '/loggers/', variables('funcName'))]"
+        //             ],
+        //             "properties": {
+        //                 "loggerId": "[concat('/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/', variables('apimName'), '/loggers/', variables('funcName'))]",
+        //                 "alwaysLog": "allErrors",
+        //                 "sampling": {
+        //                     "percentage": 100,
+        //                     "samplingType": "fixed"
+        //                 }
+        //             }
+        //         }
+        //     ]
+        // },        
         {
             "type": "Microsoft.ServiceBus/namespaces",
             "apiVersion": "2018-01-01-preview",
