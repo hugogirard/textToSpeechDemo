@@ -4,10 +4,10 @@ on:
   workflow_dispatch:  
   push:
     branches:
-      - v2.1
+      - main
     paths:
       - 'src/WebApp/**'
-      - .github/workflows/deploy-blazor.yml
+      - '.github/workflows/deploy-blazor.yml'
 
 env: 
   WEB_APP_NAME: front-end-demo-speech4cmtfi77xas52
@@ -31,7 +31,7 @@ jobs:
           dotnet build src/WebApp/BlazorClient/BlazorClient.csproj -c Release
           dotnet publish src/WebApp/BlazorClient/BlazorClient.csproj -c Release -o output
 
-      - name: Deploying job api to Azure
+      - name: Deploy blazor app to Azure
         uses: azure/webapps-deploy@v1
         with:
           app-name: ${{ env.WEB_APP_NAME }}
