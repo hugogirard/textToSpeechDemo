@@ -173,7 +173,7 @@
                         {
                             "name": "Api:ValetScope",
                             "value": "ValetApi.All"
-                        },
+                        }
                     ]
                 }
             }                     
