@@ -26,11 +26,11 @@
                         <th>@Job.Language</th>
                         <th>
                             <audio controls>
-                                <source src="@AudioUri" />
+                                <source src="@AudioUri"/>
                             </audio>    
                         </th>
                         <th>
-                            <button @onclick="Download" class="btn btn-primary">Download</button>
+                            <a href="@AudioUri" download="" class="btn btn-primary" role="button">Download</a>                            
                         </th>
                     </tr>
                 </tbody>
@@ -64,10 +64,5 @@
 
         Loading = false;
 
-    }
-
-    private async Task Download()
-    {
-        await _jsRuntime.InvokeVoidAsync("downloadFromUrl", AudioUri);
     }
 }

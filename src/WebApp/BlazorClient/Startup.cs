@@ -54,12 +54,13 @@ namespace BlazorClient
 
             services.AddHttpContextAccessor();
             services.AddSingleton<ITelemetryInitializer, TelemetryInitalizer>();
-            services.AddSignalR().AddAzureSignalR(o => 
+#if !DEBUG
+            services.AddSignalR().AddAzureSignalR(o =>
             {
                 o.ServerStickyMode = Microsoft.Azure.SignalR.ServerStickyMode.Required;
                 o.ConnectionString = Configuration["SignalRService"];
             });
-
+#endif
             services.AddControllersWithViews().AddMicrosoftIdentityUI();
 
             services.AddAuthorization(options =>
