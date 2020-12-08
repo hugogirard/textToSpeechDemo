@@ -5,4 +5,3 @@ This demo expose an Azure Architecture using Azure Cognitive Services to convert
 When the text is detected another function will be triggered and will call again Azure Cognitive Services to conver the text to audio file and save it in a blob.
 
 # Architecture Diagram
-
