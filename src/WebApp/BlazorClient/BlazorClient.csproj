@@ -6,6 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Services\Http\**" />
+    <Content Remove="Services\Http\**" />
+    <EmbeddedResource Remove="Services\Http\**" />
+    <None Remove="Services\Http\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.15.0" />
     <PackageReference Include="Microsoft.Azure.SignalR" Version="1.5.1" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="3.1.9" />
@@ -14,7 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\Http\" />
     <Folder Include="wwwroot\css\font-awesome\" />
   </ItemGroup>
 
